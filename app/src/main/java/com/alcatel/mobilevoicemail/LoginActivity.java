@@ -26,6 +26,9 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -250,14 +253,27 @@ public class LoginActivity extends ActionBarActivity implements LoaderCallbacks<
 
         private final String mEmail;
         private final String mPassword;
+        private final URL mPrivateUrl;
+        private final URL mPublicUrl;
 
-        UserLoginTask(String email, String password) {
+
+        UserLoginTask(String email, String password, URL privateUrl, URL publicUrl) {
             mEmail = email;
             mPassword = password;
+            mPrivateUrl = privateUrl;
+            mPublicUrl = publicUrl;
         }
 
         @Override
         protected Boolean doInBackground(Void... params) {
+            try {
+                HttpURLConnection connection = (HttpURLConnection) mPrivateUrl.openConnection();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+
+
             // TODO: attempt authentication against a network service.
 
             try {
