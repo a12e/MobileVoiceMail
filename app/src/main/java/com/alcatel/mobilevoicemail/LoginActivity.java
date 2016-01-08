@@ -28,6 +28,7 @@ import android.widget.TextView;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -140,7 +141,12 @@ public class LoginActivity extends ActionBarActivity implements LoaderCallbacks<
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
             showProgress(true);
-            mAuthTask = new UserLoginTask(email, password);
+            try {
+                mAuthTask = new UserLoginTask(email,password, new URL ("tps-opentouch.u-strasbg.fr"), new URL ("tps-opentouch.u-strasbg.fr"));
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            }
+
             mAuthTask.execute((Void) null);
         }
     }
