@@ -15,23 +15,23 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
+        android:name="com.alcatel.mobilevoicemail.App"
         android:theme="@style/AppTheme">
         <activity
             android:name=".LoginActivity"
             android:label="@string/app_name">
-        </activity>
-        <activity
-            android:name=".RecordMessageActivity"
-            android:label="@string/title_activity_record_message"/>
-        <activity
-            android:name=".ThreadsActivity"
-            android:label="@string/title_activity_threads">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".RecordMessageActivity"
+            android:label="@string/title_activity_record_message"/>
+        <activity
+            android:name=".ThreadsActivity"
+            android:label="@string/title_activity_threads"/>
     </application>
 
 </manifest>
