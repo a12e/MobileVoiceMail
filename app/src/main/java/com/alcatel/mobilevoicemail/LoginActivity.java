@@ -26,6 +26,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import org.json.JSONException;
+
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
@@ -57,10 +59,20 @@ public class LoginActivity extends ActionBarActivity implements LoaderCallbacks<
     private View mProgressView;
     private View mLoginFormView;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+
+       /* OpenTouchAuthentication auth = new OpenTouchAuthentication();
+        try {
+            auth.connectOpenTouch();
+        } catch (JSONException e) {
+            System.out.println("et c'est le  crash");
+            e.printStackTrace();
+        }*/
         // Set up the login form.
         mEmailView = (AutoCompleteTextView) findViewById(R.id.email);
         populateAutoComplete();
@@ -81,13 +93,21 @@ public class LoginActivity extends ActionBarActivity implements LoaderCallbacks<
         mEmailSignInButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-                attemptLogin();
+                //attemptLogin();
+                OpenTouchAuthentication auth = new OpenTouchAuthentication();
+                try {
+                    auth.connectOpenTouch();
+                } catch (JSONException e) {
+                    System.out.println("et c'est le  crash");
+                    e.printStackTrace();
+                }
             }
         });
 
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
     }
+
 
     private void populateAutoComplete() {
         getLoaderManager().initLoader(0, null, this);
@@ -224,6 +244,7 @@ public class LoginActivity extends ActionBarActivity implements LoaderCallbacks<
         }
 
         addEmailsToAutoComplete(emails);
+        OpentouchClient.initialize();
     }
 
     @Override
