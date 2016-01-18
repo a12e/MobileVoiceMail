@@ -3,6 +3,7 @@ package com.alcatel.mobilevoicemail;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
+import android.content.SharedPreferences;
 import android.support.v7.app.ActionBarActivity;
 import android.app.LoaderManager.LoaderCallbacks;
 
@@ -23,6 +24,7 @@ import android.view.inputmethod.EditorInfo;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -34,6 +36,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 
 /**
@@ -59,25 +62,97 @@ public class LoginActivity extends ActionBarActivity implements LoaderCallbacks<
     private View mProgressView;
     private View mLoginFormView;
 
+    //TODO PRENDRE EN COMPTE LURL AUSSI POUR LAUTHENTIFICATION
+    private AutoCompleteTextView mPubUrl;
+    private AutoCompleteTextView mPrivUrl;
+    public static final String PREFS_NAME = "MyPrefsFile";
+    private static final String PREFS_PASS = "userPassword";
+    private static final String PREFS_MAIL = "userEmail";
+    private static final String PREFS_PUBURL = "userPubUrl";
+    private static final String PREFS_PRIVURL = "userPrivUrl";
+    private static final String PREFS_REMEMBERME = "rememberMe";
 
+    //TODO PASS EN CLAIR DANS PREF
+    private String getOnPreference(String prefs) {
+        String prefName = null;
+        try {
+
+            SharedPreferences myPrefs2 = App.getContext().getSharedPreferences(PREFS_NAME,
+                    MODE_PRIVATE);
+            prefName = myPrefs2.getString(prefs,"");
+        } catch (Exception e) {
+            System.out.println(">>ERREUR PREF1");
+        }
+        return prefName;
+    }
+    private void setOnPreference(String prefs,String value) {
+        try {
+            SharedPreferences myPrefs = App.getContext().getSharedPreferences(PREFS_NAME,
+                    MODE_PRIVATE);
+            SharedPreferences.Editor prefsEditor = myPrefs.edit();
+            prefsEditor.putString(prefs, value);
+            prefsEditor.commit();
+        } catch (Exception e) {
+            System.out.println(">>ERREUR PREF2" + e);
+        }
+    }
+
+    private void clean_preferences(){
+        this.setOnPreference(PREFS_PASS,"");
+        this.setOnPreference(PREFS_MAIL,"");
+        this.setOnPreference(PREFS_PUBURL,"");
+        this.setOnPreference(PREFS_PRIVURL,"");
+        this.setOnPreference(PREFS_REMEMBERME,"");
+    }
+    public void onCheckboxRememberMeClicked(View view) {
+        // Is the view now checked? // TODO SALE ?  ?? un switch alors que y a qu'un cas.. mais bon wtf
+
+
+        boolean checked = ((CheckBox)findViewById(R.id.checkbox_rememberme)).isChecked();
+
+        if (checked) {
+            System.out.println("CHECKED");
+            this.setOnPreference(PREFS_REMEMBERME, "true");
+        } else{
+            System.out.println("PAS CHECKED");
+            this.setOnPreference(PREFS_REMEMBERME, "false");
+        }
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-       /* OpenTouchAuthentication auth = new OpenTouchAuthentication();
-        try {
-            auth.connectOpenTouch();
-        } catch (JSONException e) {
-            System.out.println("et c'est le  crash");
-            e.printStackTrace();
-        }*/
+
+        System.out.println("->mdp" + this.getOnPreference(PREFS_PASS));
+        System.out.println("->rememberme" + this.getOnPreference(PREFS_REMEMBERME));
+        System.out.println("->puburl " + this.getOnPreference(PREFS_PUBURL));
+        System.out.println("->privurl " + this.getOnPreference(PREFS_PRIVURL));
+        CheckBox temp = ((CheckBox)findViewById(R.id.checkbox_rememberme));
+
         // Set up the login form.
         mEmailView = (AutoCompleteTextView) findViewById(R.id.email);
+        mPrivUrl = (AutoCompleteTextView) findViewById(R.id.urlpublic);
+        mPubUrl = (AutoCompleteTextView) findViewById(R.id.url_private);
         populateAutoComplete();
 
         mPasswordView = (EditText) findViewById(R.id.password);
+
+        if(Objects.equals(this.getOnPreference(PREFS_REMEMBERME), "true")) {
+            mPasswordView.setText(this.getOnPreference(PREFS_PASS));
+            System.out.println("hey pref " + this.getOnPreference(PREFS_MAIL));
+            mEmailView.setText(this.getOnPreference(PREFS_MAIL));
+            mPrivUrl.setText(this.getOnPreference(PREFS_PRIVURL));
+            mPubUrl.setText(this.getOnPreference(PREFS_PUBURL));
+        }
+
+        if (Objects.equals(this.getOnPreference(PREFS_REMEMBERME),"true")){
+            temp.setChecked(true); System.out.println("true pref");}
+        else{ //TODO jenleve mdp si on decoche dans la memoire..? mais bizarre jenleve au lancement
+            temp.setChecked(false); this.clean_preferences(); System.out.println("ici passe");}
+
+
         mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
@@ -94,11 +169,18 @@ public class LoginActivity extends ActionBarActivity implements LoaderCallbacks<
             @Override
             public void onClick(View view) {
                 //attemptLogin();
+
+                LoginActivity prefreglage = new LoginActivity();
+                prefreglage.setOnPreference(PREFS_PASS,mPasswordView.getText().toString());
+                prefreglage.setOnPreference(PREFS_MAIL,mEmailView.getText().toString());
+                prefreglage.setOnPreference(PREFS_PUBURL,mPubUrl.getText().toString());
+                prefreglage.setOnPreference(PREFS_PRIVURL,mPrivUrl.getText().toString());
                 OpenTouchAuthentication auth = new OpenTouchAuthentication();
+
                 try {
-                    auth.connectOpenTouch();
+                    auth.connectOpenTouch(mEmailView.getText().toString(),mPasswordView.getText().toString());
                 } catch (JSONException e) {
-                    System.out.println("et c'est le  crash");
+                    System.out.println("crash");
                     e.printStackTrace();
                 }
             }
