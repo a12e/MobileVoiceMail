@@ -10,9 +10,6 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSession;
 import javax.net.ssl.X509TrustManager;
 
-/**
- * Created by Masamune on 11/01/2016.
- */
 public class TrustEveryone {
     public static void trustEveryone() {
         try {
