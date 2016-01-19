@@ -69,12 +69,9 @@ public class OpenTouchAuthentication {
                                 System.out.println("infocookie:" + cookieInfo);
                                 BasicClientCookie newCookie = new BasicClientCookie("AlcUserId", cookieInfo);
                                 newCookie.setVersion(1);
-                                newCookie.setDomain("https://tps-opentouch.u-strasbg.fr"); // met quoi là ?
+                                newCookie.setDomain("https://tps-opentouch.u-strasbg.fr");
                                 newCookie.setPath("/");
-                                // REMETTER ATTENTION>OpentouchClient.getMyCookieStore().addCookie(newCookie);
 
-                                //RequestParams params = new RequestParams();
-                                //params.put("Set-Cookie",cookieInfo);puis remplacer null par params
                                 OpentouchClient.get("/authenticate?version=1.0", null, new JsonHttpResponseHandler() {
                                     @Override
                                     public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
@@ -131,24 +128,20 @@ public class OpenTouchAuthentication {
                 System.out.println(">>>>>>>>>POST SUCCESS1<<<<<<<<<");
                 System.out.println(response.toString());
                 System.out.println(">>>>>>>>>POST FINSUCCESS1<<<<<<<<<");
-                // If the response is JSONObject instead of expected JSONArray
             }
 
             @Override
             public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
-                //super.onFailure(statusCode, headers, throwable, errorResponse);
                 System.out.println(">>>>>>>>>POST ERROR SYSTEM OBJECT<<<<<<<<<");
             }
 
             @Override
             public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONArray errorResponse) {
-                //super.onFailure(statusCode, headers, throwable, errorResponse);
                 System.out.println(">>>>>>>>>POST ERROR SYSTEM ARRAY<<<<<<<<<");
             }
 
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONArray timeline) {
-                // Pull out the first event on the public timeline
                 JSONObject firstEvent = null;
                 try {
                     firstEvent = timeline.getJSONObject(0);
@@ -162,7 +155,6 @@ public class OpenTouchAuthentication {
                     e.printStackTrace();
                 }
 
-                // Do something with the response
                 System.out.println("=========POST PASSE ICI======");
                 System.out.println(tweetText);
                 System.out.println("=========POST FIN PASSE ICI======");
@@ -172,10 +164,5 @@ public class OpenTouchAuthentication {
 
 
     protected void onCreate(Bundle savedInstanceState) {
-        /*try {
-            this.connectOpenTouch();
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }*/
     }
 }

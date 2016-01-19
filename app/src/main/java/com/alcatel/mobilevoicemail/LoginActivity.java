@@ -73,6 +73,7 @@ public class LoginActivity extends ActionBarActivity implements LoaderCallbacks<
     private static final String PREFS_REMEMBERME = "rememberMe";
 
     //TODO PASS EN CLAIR DANS PREF
+    //Recuperer information preference
     private String getOnPreference(String prefs) {
         String prefName = null;
         try {
@@ -85,6 +86,8 @@ public class LoginActivity extends ActionBarActivity implements LoaderCallbacks<
         }
         return prefName;
     }
+
+    // Modifier valeur sauvegarder sur le telephone
     private void setOnPreference(String prefs,String value) {
         try {
             SharedPreferences myPrefs = App.getContext().getSharedPreferences(PREFS_NAME,
@@ -97,6 +100,7 @@ public class LoginActivity extends ActionBarActivity implements LoaderCallbacks<
         }
     }
 
+    //Enlever les informations sauvegardes, par exemple lorsque rememberme est decoche
     private void clean_preferences(){
         this.setOnPreference(PREFS_PASS,"");
         this.setOnPreference(PREFS_MAIL,"");
@@ -105,7 +109,7 @@ public class LoginActivity extends ActionBarActivity implements LoaderCallbacks<
         this.setOnPreference(PREFS_REMEMBERME,"");
     }
     public void onCheckboxRememberMeClicked(View view) {
-        // Is the view now checked? // TODO SALE ?  ?? un switch alors que y a qu'un cas.. mais bon wtf
+        // Is the view now checked? // TODO: Faire un switch plutot
 
 
         boolean checked = ((CheckBox)findViewById(R.id.checkbox_rememberme)).isChecked();

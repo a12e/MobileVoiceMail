@@ -1,9 +1,6 @@
 package com.alcatel.mobilevoicemail;
 
 
-/**
- * Created by Masamune on 08/01/2016.
- */
 import com.loopj.android.http.*;
 
 import java.io.IOException;
