@@ -3,6 +3,7 @@ package com.alcatel.mobilevoicemail;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.support.v7.app.ActionBarActivity;
 import android.app.LoaderManager.LoaderCallbacks;
@@ -174,11 +175,10 @@ public class LoginActivity extends ActionBarActivity implements LoaderCallbacks<
             public void onClick(View view) {
                 //attemptLogin();
 
-                LoginActivity prefreglage = new LoginActivity();
-                prefreglage.setOnPreference(PREFS_PASS,mPasswordView.getText().toString());
-                prefreglage.setOnPreference(PREFS_MAIL,mEmailView.getText().toString());
-                prefreglage.setOnPreference(PREFS_PUBURL,mPubUrl.getText().toString());
-                prefreglage.setOnPreference(PREFS_PRIVURL,mPrivUrl.getText().toString());
+                LoginActivity.this.setOnPreference(PREFS_PASS, mPasswordView.getText().toString());
+                LoginActivity.this.setOnPreference(PREFS_MAIL, mEmailView.getText().toString());
+                LoginActivity.this.setOnPreference(PREFS_PUBURL, mPubUrl.getText().toString());
+                LoginActivity.this.setOnPreference(PREFS_PRIVURL, mPrivUrl.getText().toString());
                 OpenTouchAuthentication auth = new OpenTouchAuthentication();
 
                 try {
@@ -187,6 +187,9 @@ public class LoginActivity extends ActionBarActivity implements LoaderCallbacks<
                     System.out.println("crash");
                     e.printStackTrace();
                 }
+
+                startActivity(new Intent(LoginActivity.this, ThreadsActivity.class));
+                LoginActivity.this.finish();
             }
         });
 
@@ -384,8 +387,6 @@ public class LoginActivity extends ActionBarActivity implements LoaderCallbacks<
             } catch (IOException e) {
                 e.printStackTrace();
             }
-
-
 
             // TODO: attempt authentication against a network service.
 
