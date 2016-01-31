@@ -4,26 +4,36 @@ import android.app.AlertDialog;
 import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.MediaRecorder;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v7.app.ActionBarActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+
+import com.dropbox.client2.DropboxAPI;
+import com.dropbox.client2.android.AndroidAuthSession;
+import com.dropbox.client2.exception.DropboxException;
 import com.intervigil.wave.WaveWriter;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 
 public class RecordMessageActivity extends ActionBarActivity {
-    private static final int RECORDER_SAMPLERATE = 8000;
+    private static final int RECORDER_SAMPLERATE = 44100;
     private static final int RECORDER_CHANNELS = AudioFormat.CHANNEL_IN_MONO;
     private static final int RECORDER_CHANNELS_COUNT = 1;
     private static final int RECORDER_AUDIO_ENCODING = AudioFormat.ENCODING_PCM_16BIT;
     private static final int RECORDER_SAMPLEBITS = 16;
+
     int mBufferSize = 0;
     short[] mBuffer = null;
-
     private AudioRecord mAudioRecord = null;
+    Boolean mRecording = false;
     private Button mRecordButton = null;
+    Thread mWriterThread;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,15 +44,21 @@ public class RecordMessageActivity extends ActionBarActivity {
         mRecordButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (mAudioRecord.getRecordingState() == AudioRecord.RECORDSTATE_RECORDING) {
+                if (mRecording) {
                     stopRecording();
                 } else {
                     startRecording();
                 }
             }
         });
+    }
 
-        mBufferSize = AudioRecord.getMinBufferSize(RECORDER_SAMPLERATE, RECORDER_CHANNELS, RECORDER_AUDIO_ENCODING);
+    protected void startRecording() {
+        mRecordButton.setText("Terminer");
+
+        mBufferSize = AudioRecord.getMinBufferSize(RECORDER_SAMPLERATE, RECORDER_CHANNELS,
+                RECORDER_AUDIO_ENCODING);
+
         mAudioRecord = new AudioRecord(
                 MediaRecorder.AudioSource.MIC,
                 RECORDER_SAMPLERATE,
@@ -55,22 +71,36 @@ public class RecordMessageActivity extends ActionBarActivity {
             alertDialog.show();
         }
         mBuffer = new short[mBufferSize];
-    }
-
-    protected void startRecording() {
-        mRecordButton.setText("Terminer");
         mAudioRecord.startRecording();
-        Thread writerThread = new Thread(new Runnable() {
+        mRecording = true;
+        Log.i("recorder", "Started recording");
+
+        mWriterThread = new Thread(new Runnable() {
             public void run() {
                 writeAudioDataToFile();
             }
         }, "AudioRecorder Thread");
-        writerThread.start();
+        mWriterThread.start();
     }
 
     protected void stopRecording() {
         mAudioRecord.stop();
+        mAudioRecord.release();
+        mRecording = false;
         mRecordButton.setText("Enregistrer");
+        Log.i(getClass().getSimpleName(), "Stopped recording");
+
+        try {
+            mWriterThread.join(); // wait for thread to finish
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        // For linking the app to the account
+        //DropboxClient.getInstance().startOAuth2Authentication(RecordMessageActivity.this);
+
+        Log.i(getClass().getSimpleName(), "Sending message to Dropbox");
+        DropboxClient.getInstance().putFile(Environment.getExternalStorageDirectory().getPath()
+                + "/test.wav");
     }
 
     private void writeAudioDataToFile() {
@@ -78,14 +108,42 @@ public class RecordMessageActivity extends ActionBarActivity {
                 "test.wav", RECORDER_SAMPLERATE, RECORDER_CHANNELS_COUNT, RECORDER_SAMPLEBITS);
         try {
             writer.createWaveFile();
+            Log.i("recorder", "Created wave file");
             while(mAudioRecord.getRecordingState() == AudioRecord.RECORDSTATE_RECORDING){
-                    int numSamples = mAudioRecord.read(mBuffer, 0, mBuffer.length);
+                int numSamples = mAudioRecord.read(mBuffer, 0, mBuffer.length);
+
+                if(numSamples == AudioRecord.ERROR_INVALID_OPERATION) {
+                    Log.e("recorder", "AudioRecord.ERROR_INVALID_OPERATION (not initialized)");
+                }
+                else if(numSamples == AudioRecord.ERROR_BAD_VALUE) {
+                    Log.e("recorder", "AudioRecord.ERROR_BAD_VALUE");
+                }
+                else {
                     writer.write(mBuffer, 0, numSamples);
-                    System.out.println("numSamples = " + numSamples);
+                }
             }
             writer.closeWaveFile();
+            Log.i("recorder", "Finished writing wave file");
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    protected void onResume() {
+        super.onResume();
+
+        if (DropboxClient.getInstance().getApi().getSession().authenticationSuccessful()) {
+            try {
+                // Required to complete auth, sets the access token on the session
+                DropboxClient.getInstance().getApi().getSession().finishAuthentication();
+
+                String accessToken = DropboxClient.getInstance().getApi().getSession().getOAuth2AccessToken();
+            } catch (IllegalStateException e) {
+                Log.i("DbAuthLog", "Error authenticating", e);
+            }
+
+            DropboxClient.getInstance().putFile(Environment.getExternalStorageDirectory().getPath()
+                    + "/test.wav");
         }
     }
 }
