@@ -15,6 +15,13 @@
         android:layout_height="wrap_content"
         android:text="Record new message"
         android:id="@+id/record_button"
-        android:layout_alignParentBottom="true"
+        android:layout_above="@+id/deconnexion"
         android:layout_alignParentEnd="true" />
+
+    <Button android:id="@+id/deconnexion" style="?android:textAppearanceSmall"
+        android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:text="@string/deconnexion"
+        android:textStyle="bold"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentStart="true" />
 </RelativeLayout>

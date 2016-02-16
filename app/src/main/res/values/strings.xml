@@ -18,6 +18,7 @@
     <string name="title_activity_record_message">RecordMessageActivity</string>
     <string name="title_activity_threads">ThreadsActivity</string>
     <string name="rememberme">Remember me</string>
+    <string name="deconnexion">Disconnect</string>
 
 
 </resources>

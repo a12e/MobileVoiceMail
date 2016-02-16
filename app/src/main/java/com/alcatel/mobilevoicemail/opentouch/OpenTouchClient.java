@@ -25,7 +25,7 @@ import javax.net.ssl.HttpsURLConnection;
 public class OpenTouchClient {
 
     private static OpenTouchClient mInstance = null;
-    private String mBaseUrl = "https://tps-opentouch.u-strasbg.fr/api/rest";
+    private String mBaseUrl = "https://192.168.1.55:443/api/rest";
 
     private OpenTouchClient() {
         CookieManager cookieManager = new CookieManager();
@@ -97,6 +97,7 @@ public class OpenTouchClient {
                 connection2.setDoInput(true);
                 connection2.connect();
                 printHTTPHeaders(getClass().getSimpleName(), connection2);
+                System.out.println("THEREEEEEEEEEEEEEEEEEEEEEEEEEEEE");
 
                 if(connection2.getResponseCode() == 401) {
                     BufferedInputStream is = new BufferedInputStream(connection2.getErrorStream());
@@ -121,9 +122,76 @@ public class OpenTouchClient {
         }
     }
 
+
+
+    class LogOutTask extends AsyncTask<String, Void, Void> {
+        protected Void doInBackground(String... params) {
+            try {
+                // Disconnect
+               // disconnect1.setDoInput(true);
+                /*  disconnect1.setDoOutput(true);
+                disconnect1.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+                disconnect1.setRequestMethod("DELETE");
+                disconnect1.connect();
+                //disconnect1.getContent();
+                printHTTPHeaders(getClass().getSimpleName(), disconnect1);
+                disconnect1.getInputStream();
+                disconnect1.disconnect();;
+
+              disconnect1.setDoInput(true);
+                disconnect1.setInstanceFollowRedirects(false);
+                disconnect1.setRequestMethod("DELETE");
+                disconnect1.setUseCaches(false);
+                printHTTPHeaders(getClass().getSimpleName(), disconnect1);
+               // connection1.getContent();
+               disconnect1.disconnect();*/
+
+               // disconnect1.setDoOutput(true);
+               // disconnect1.setRequestMethod("DELETE");
+
+                //disconnect1.connect();
+                //printHTTPHeaders(getClass().getSimpleName(), disconnect1);
+                /* CODE AVEC 403*/
+
+
+                HttpsURLConnection disconnect1 = createHTTPSConnection("DELETE", "/1.0/sessions");
+                disconnect1.setRequestProperty("Accept", "application/json, application/xml, text/json, text/x-json, text/javascript, text/xml");
+                disconnect1.setRequestProperty("Content-Type", "application/json");
+                disconnect1.connect();
+                printHTTPHeaders(getClass().getSimpleName(), disconnect1);
+                //disconnect1.disconnect();
+
+
+
+
+                // We expect a 204
+                if(disconnect1.getResponseCode() != 204) {
+                    throw new ProtocolException("Expected a 204 response code");
+                }
+                // Connection successful
+                App.getContext().sendBroadcast(new Intent("LOGOUT_SUCCESS"));
+                return null;
+            }
+            catch(Exception e) {
+                // Connection error
+                Log.e(getClass().getSimpleName(), "Log out error");
+                Log.e(getClass().getSimpleName(), e.toString());
+                App.getContext().sendBroadcast(new Intent("LOGOUT_ERROR"));
+            }
+            return null;
+        }
+    }
+
+
     public void login(String email, String password) {
         Log.i(getClass().getSimpleName(), "Starting login");
         new LoginTask().execute(email, password);
+    }
+
+    public void logout(){
+        Log.i(getClass().getSimpleName(), "Starting logout");
+        new LogOutTask().execute();
+
     }
 
 }
