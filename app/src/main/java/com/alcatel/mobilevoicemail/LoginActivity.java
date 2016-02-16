@@ -22,6 +22,15 @@ import android.widget.TextView;
 
 import com.alcatel.mobilevoicemail.opentouch.OpenTouchClient;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Objects;
 
 /**
@@ -185,6 +194,80 @@ public class LoginActivity extends ActionBarActivity {
         this.unregisterReceiver(mLoginSuccessReceiver);
         this.unregisterReceiver(mLoginErrorReceiver);
         super.onDestroy();
+    }
+
+    void subscribe(String url) {
+        try {
+            // i.e.: request = "http://example.com/index.php?param1=a&param2=b&param3=c";
+            URL object = new URL(url);
+            HttpURLConnection urlConnection  = (HttpURLConnection) object.openConnection();
+
+            urlConnection.setDoOutput(true);
+            urlConnection.setDoInput(true);
+            urlConnection.setRequestProperty("Content-Type", "application/json");
+            urlConnection.setRequestProperty("Accept", "application/json");
+            urlConnection.setRequestMethod("POST");
+
+            JSONArray user_id = new JSONArray();
+            user_id.put("tpvoip0"); // TODO REPLACE tpvoip0 par le login faut faire un get login .... dynamique & co
+
+            JSONArray telephony = new JSONArray();
+            telephony.put("telephony");
+
+            JSONArray unifiedComLog = new JSONArray();
+            unifiedComLog.put("unifiedComLog");
+
+            JSONArray vide = new JSONArray();
+
+            JSONObject id1 = new JSONObject();
+            id1.put("ids",user_id);
+            id1.put("names",telephony);
+            id1.put("families",vide);
+            id1.put("origins",vide);
+
+            JSONObject id2 = new JSONObject();
+            id2.put("ids",user_id);
+            id2.put("names",unifiedComLog);
+            id2.put("families",vide);
+            id2.put("origins",vide);
+
+            JSONArray id = new JSONArray();
+            id.put(id1);
+            id.put(id2);
+
+            JSONObject selector = new JSONObject();
+            selector.put("selector", id);
+
+            JSONObject filter = new JSONObject();
+            filter.put("filter", selector);
+            filter.put("mode","CHUNK");
+            filter.put("format","JSON");
+            filter.put("version","1.0");
+            filter.put("timeout",10);
+
+            OutputStreamWriter out = new OutputStreamWriter(urlConnection.getOutputStream());
+            out.write(filter.toString());
+            out.close();
+
+            int HttpResult =urlConnection.getResponseCode();
+            if(HttpResult == HttpURLConnection.HTTP_OK){
+                System.out.println("*=*=*=*=*=*=*=* Succès ! *=*=*=*=*=*=*=*");
+
+            }else{
+                System.out.println(urlConnection.getResponseMessage());
+            }
+        }
+        catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+        catch (IOException e) {
+
+            e.printStackTrace();
+        }
+        catch (JSONException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
     }
 }
 
