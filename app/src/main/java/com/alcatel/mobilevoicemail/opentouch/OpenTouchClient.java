@@ -30,8 +30,8 @@ import javax.net.ssl.HttpsURLConnection;
 public class OpenTouchClient {
 
     private static OpenTouchClient mInstance = null;
-    //private String mBaseUrl = "https://tps-opentouch.u-strasbg.fr/api/rest";
-    private String mBaseUrl = "https://192.168.1.10:4430/api/rest";
+    private String mBaseUrl = "https://tps-opentouch.u-strasbg.fr/api/rest";
+    //private String mBaseUrl = "https://192.168.1.10:4430/api/rest";
     private String mLoginName = null;
 
     private OpenTouchClient() {
