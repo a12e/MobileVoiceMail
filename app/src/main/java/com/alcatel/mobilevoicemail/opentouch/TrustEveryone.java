@@ -1,4 +1,4 @@
-package com.alcatel.mobilevoicemail;
+package com.alcatel.mobilevoicemail.opentouch;
 
 import java.security.SecureRandom;
 import java.security.cert.CertificateException;
