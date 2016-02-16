@@ -31,7 +31,7 @@ public class OpenTouchClient {
 
     private static OpenTouchClient mInstance = null;
     private String mBaseUrl = "https://tps-opentouch.u-strasbg.fr/api/rest";
-
+    private String mLoginName = null;
     private OpenTouchClient() {
         CookieHandler.setDefault(new CookieManager());
         HttpsURLConnection.setFollowRedirects(false);
