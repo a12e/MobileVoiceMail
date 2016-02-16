@@ -3,6 +3,7 @@ package com.alcatel.mobilevoicemail;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.support.v7.app.ActionBarActivity;
@@ -28,6 +29,9 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.TextView;
+
+import com.alcatel.mobilevoicemail.opentouch.ExceptionHandler;
+import com.alcatel.mobilevoicemail.opentouch.OpenTouchClient;
 
 import org.json.JSONException;
 
@@ -179,14 +183,20 @@ public class LoginActivity extends ActionBarActivity implements LoaderCallbacks<
                 LoginActivity.this.setOnPreference(PREFS_MAIL, mEmailView.getText().toString());
                 LoginActivity.this.setOnPreference(PREFS_PUBURL, mPubUrl.getText().toString());
                 LoginActivity.this.setOnPreference(PREFS_PRIVURL, mPrivUrl.getText().toString());
-                OpenTouchAuthentication auth = new OpenTouchAuthentication();
+                //OpenTouchAuthentication auth = new OpenTouchAuthentication();
 
-                try {
-                    auth.connectOpenTouch(mEmailView.getText().toString(),mPasswordView.getText().toString());
-                } catch (JSONException e) {
-                    System.out.println("crash");
-                    e.printStackTrace();
-                }
+                //auth.connectOpenTouch(mEmailView.getText().toString(),mPasswordView.getText().toString());
+                OpenTouchClient.getInstance().login(
+                        mEmailView.getText().toString(),
+                        mPasswordView.getText().toString(),
+                        new ExceptionHandler() {
+                            @Override
+                            public void handle(Exception e) {
+                                // AlertBox
+                                e.printStackTrace();
+                            }
+                        }
+                );
 
                 startActivity(new Intent(LoginActivity.this, ThreadsActivity.class));
                 LoginActivity.this.finish();

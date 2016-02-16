@@ -18,7 +18,7 @@ public class DropboxClient {
 
     final static private String APP_KEY = "ydma9rv0xm4wf4d";
     final static private String APP_SECRET = "ei7oouuh13yfp4l";
-    final static private String APP_OATOKEN = "";
+    final static private String APP_OATOKEN = "rnLcn28O8aAAAAAAAAAADBleuAZTS0BR9D0i0jDCILtqaUJHd489W0mJjHJwsvmn";
     private DropboxAPI<AndroidAuthSession> mDBApi = null;
 
     private DropboxClient() {
