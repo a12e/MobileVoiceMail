@@ -39,7 +39,7 @@ public class OpenTouchClient {
     private CookieManager mCookieStore;
     private OpenTouchClient() {
         mCookieStore = new CookieManager();
-        CookieHandler.setDefault(mCookieStore); //BAKUP CookieHandler.setDefault(new CookieManager());
+        CookieHandler.setDefault(mCookieStore);
         HttpsURLConnection.setFollowRedirects(false);
         TrustEveryone.trustEveryone();
     }
@@ -210,6 +210,32 @@ public class OpenTouchClient {
         }
     }
 
+    class getContactsOpenTouchTask extends AsyncTask<String, Void, Void> {
+        protected Void doInBackground(String... params) {
+            try {
+                // Disconnect
+                //requestJson("POST", "/1.0/directory/search", "{\"directory\":null,\"limit\":0,\"filter\":{\"field\":\"lastName\",\"operand\":\"\",\"operation\":\"CONTAIN\"}}");
+                requestJson("POST", "/1.0/directory/search", "{\"directory\":null,\"limit\":0,\"filter\":{\"field\":\"lastName\",\"operand\":\"t\",\"operation\":\"CONTAIN\"}}");
+
+                //App.getContext().sendBroadcast(new Intent("GETCONTACT_SUCCESS"));
+                return null;
+
+                // We expect a 204
+                /*if(disconnect1.getResponseCode() != 204) {
+                    throw new ProtocolException("Expected a 204 response code");
+                }*/
+                // Connection successful cf http://developer.android.com/reference/java/net/CookieStore.html y a removeALL
+            }
+            catch(Exception e) {
+                // Connection error
+                Log.e(getClass().getSimpleName(), "Get contacts error");
+                Log.e(getClass().getSimpleName(), e.toString());
+                e.printStackTrace();
+                App.getContext().sendBroadcast(new Intent("GETCONTACTS_ERROR"));
+            }
+            return null;
+        }
+    }
 
     public void login(String email, String password) {
         Log.i(getClass().getSimpleName(), "Starting login");
@@ -218,7 +244,13 @@ public class OpenTouchClient {
 
     public void logout(){
         Log.i(getClass().getSimpleName(), "Starting logout");
+        // OpenTouchClient.getInstance().getContactsOpenTouch();
         new LogOutTask().execute();
+    }
+
+    public void getContactsOpenTouch(){
+        Log.i(getClass().getSimpleName(), "Starting getting all contacts from Opentouch");
+        new getContactsOpenTouchTask().execute();
 
     }
 
