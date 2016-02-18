@@ -5,12 +5,8 @@ import android.util.Log;
 
 import com.alcatel.mobilevoicemail.opentouch.OpenTouchClient;
 
-import java.io.BufferedInputStream;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.net.ssl.HttpsURLConnection;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 public class MessageRepository {
 
@@ -22,34 +18,27 @@ public class MessageRepository {
         return mInstance;
     }
 
-    private class FetchReceivedMessagesTask extends AsyncTask<Void, Void, List<Integer>> {
+    private class FetchReceivedMessagesTask extends AsyncTask<Void, Void, Void> {
         @Override
-        protected List<Integer> doInBackground(Void... params) {
+        protected Void doInBackground(Void... params) {
             Log.i(getClass().getSimpleName(), "Fetching messages");
-            List<Integer> list = new ArrayList<Integer>();
 
             try {
-                HttpsURLConnection connection = OpenTouchClient.getInstance().createHTTPSConnection("GET", "/1.0/messaging/mailboxes");
-                connection.setDoInput(true);
-                OpenTouchClient.printHTTPHeaders(getClass().getSimpleName(), connection);
-                connection.connect();
-                OpenTouchClient.printHTTPHeaders(getClass().getSimpleName(), connection);
-                if(connection.getResponseCode() == 200) {
-                    BufferedInputStream is = new BufferedInputStream(connection.getInputStream());
-                    String result = OpenTouchClient.readFromStream(is);
-                    Log.d(getClass().getSimpleName(), "RESULT " + result);
+                JSONObject response = OpenTouchClient.getInstance().getJson("/1.0/messaging/mailboxes");
+                JSONArray mailBoxes = response.getJSONArray("mailboxes");
+                for(int i = 0; i < mailBoxes.length(); i++) {
+                    // Get all messages from this mailbox
+                    int mailboxId = mailBoxes.getJSONObject(i).getInt("id");
+                    Log.i(getClass().getSimpleName(), "Fetching all messages from mailbox " + mailBoxes.getJSONObject(i).getString("name"));
+
+                    response = OpenTouchClient.getInstance().getJson("/1.0/messaging/mailboxes/" + mailboxId + "/voicemails");
+                    Log.i(getClass().getSimpleName(), "Messages list " + response);
                 }
-                connection.disconnect();
-            } catch (IOException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
 
-            return list;
-        }
-        @Override
-        protected void onPostExecute(List<Integer> integers) {
-            super.onPostExecute(integers);
-            Log.d(getClass().getSimpleName(), "Mailboxes are : " + integers.toString());
+            return null;
         }
     }
 

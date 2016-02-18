@@ -33,7 +33,7 @@ import javax.net.ssl.HttpsURLConnection;
 public class OpenTouchClient {
 
     private static OpenTouchClient mInstance = null;
-    private String mBaseUrl = "https://192.168.1.55:443/api/rest"; // "https://tps-opentouch.u-strasbg.fr/api/rest"
+    private String mBaseUrl = "https://tps-opentouch.u-strasbg.fr/api/rest";
     private String mLoginName = null;
 
     private CookieManager mCookieStore;
@@ -179,8 +179,6 @@ public class OpenTouchClient {
         }
     }
 
-
-
     class LogOutTask extends AsyncTask<String, Void, Void> {
         protected Void doInBackground(String... params) {
             try {
@@ -210,7 +208,6 @@ public class OpenTouchClient {
         }
     }
 
-
     public void login(String email, String password) {
         Log.i(getClass().getSimpleName(), "Starting login");
         new LoginTask().execute(email, password);
@@ -219,7 +216,6 @@ public class OpenTouchClient {
     public void logout(){
         Log.i(getClass().getSimpleName(), "Starting logout");
         new LogOutTask().execute();
-
     }
 
 }
