@@ -10,12 +10,14 @@ import com.alcatel.mobilevoicemail.opentouch.exceptions.AuthenticationException;
 import com.alcatel.mobilevoicemail.opentouch.exceptions.ProtocolException;
 
 import org.apache.http.HttpException;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -33,13 +35,15 @@ import javax.net.ssl.HttpsURLConnection;
 public class OpenTouchClient {
 
     private static OpenTouchClient mInstance = null;
-    private String mBaseUrl = "https://tps-opentouch.u-strasbg.fr/api/rest";
+//    private String mBaseUrl = "https://tps-opentouch.u-strasbg.fr/api/rest";
+    private String mBaseUrl = "https://192.168.1.10:4430/api/rest";
     private String mLoginName = null;
-
     private CookieManager mCookieStore;
+    private Mailbox mDefaultMailbox;
+
     private OpenTouchClient() {
         mCookieStore = new CookieManager();
-        CookieHandler.setDefault(mCookieStore); //BAKUP CookieHandler.setDefault(new CookieManager());
+        CookieHandler.setDefault(mCookieStore);
         HttpsURLConnection.setFollowRedirects(false);
         TrustEveryone.trustEveryone();
     }
@@ -52,6 +56,10 @@ public class OpenTouchClient {
 
     public String getLoginName() {
         return mLoginName;
+    }
+
+    public Mailbox getDefaultMailbox() {
+        return mDefaultMailbox;
     }
 
     public HttpsURLConnection createHTTPSConnection(String method, String relativeUrl) throws IOException {
@@ -89,11 +97,13 @@ public class OpenTouchClient {
         }
     }
 
-    public JSONObject getJson(String relativeUrl) throws JSONException, IOException, HttpException {
+    public JSONObject getJson(String relativeUrl)
+            throws JSONException, IOException, HttpException, ProtocolException {
         return requestJson("GET", relativeUrl, "");
     }
 
-    public JSONObject requestJson(String httpVerb, String relativeUrl, String postData) throws IOException, JSONException, HttpException {
+    public JSONObject requestJson(String httpVerb, String relativeUrl, String postData)
+            throws IOException, JSONException, HttpException, ProtocolException {
         HttpsURLConnection connection = createHTTPSConnection(httpVerb, relativeUrl);
         connection.setRequestProperty("Content-Type", "application/json");
         connection.setRequestProperty("Accept", "application/json");
@@ -107,13 +117,31 @@ public class OpenTouchClient {
         }
 
         connection.connect();
-        BufferedInputStream is = new BufferedInputStream(connection.getInputStream());
-        String response = readFromStream(is);
-        connection.disconnect();
+        String response = "{}";
 
-        if(connection.getResponseCode() != HttpURLConnection.HTTP_OK) {
-            throw new HttpException();
+        if(connection.getResponseCode() != HttpURLConnection.HTTP_NO_CONTENT) {
+            try {
+                BufferedInputStream is = new BufferedInputStream(connection.getInputStream());
+                response = readFromStream(is);
+            } catch (FileNotFoundException fnfe) {
+                Log.e(getClass().getSimpleName(), "The server returned an empty response :(");
+                Log.e(getClass().getSimpleName(), "HTTP response code is " + connection.getResponseCode());
+            }
         }
+
+        if(connection.getResponseCode() != HttpURLConnection.HTTP_OK
+                && connection.getResponseCode() != HttpURLConnection.HTTP_NO_CONTENT) {
+            BufferedInputStream is = new BufferedInputStream(connection.getErrorStream());
+            response = readFromStream(is);
+            JSONObject error = new JSONObject(response);
+            Log.e(getClass().getSimpleName(), "httpStatus = " + error.getString("httpStatus"));
+            Log.e(getClass().getSimpleName(), "helpMessage = " + error.getString("helpMessage"));
+            Log.e(getClass().getSimpleName(), "type = " + error.getString("type"));
+            Log.e(getClass().getSimpleName(), "innerMessage = " + error.getString("innerMessage"));
+            throw new ProtocolException("Something went wrong");
+        }
+
+        connection.disconnect();
 
         // Convert to JSON
         return new JSONObject(response);
@@ -164,6 +192,11 @@ public class OpenTouchClient {
                 JSONObject logins = getJson("/1.0/logins");
                 mLoginName = logins.getJSONArray("loginNames").get(0).toString();
                 Log.i(getClass().getSimpleName(), "Now connected with login name " + mLoginName);
+
+                // Fetch all mailboxes, and set the first as default mailbox
+                JSONArray mailBoxes = getJson("/1.0/messaging/mailboxes").getJSONArray("mailboxes");
+                int defaultMailboxId = mailBoxes.getJSONObject(0).getInt("id");
+                mDefaultMailbox = new Mailbox(defaultMailboxId);
 
                 // Connection successful
                 App.getContext().sendBroadcast(new Intent("LOGIN_SUCCESS"));

@@ -21,7 +21,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.alcatel.mobilevoicemail.opentouch.OpenTouchClient;
-import com.alcatel.mobilevoicemail.opentouch.messages.MessageRepository;
+import com.alcatel.mobilevoicemail.opentouch.Mailbox;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -177,7 +177,7 @@ public class LoginActivity extends ActionBarActivity {
         @Override
         public void onReceive(Context context, Intent intent) {
             startActivity(new Intent(LoginActivity.this, ThreadsActivity.class));
-            MessageRepository.getInstance().fetchReceivedMessages();
+            OpenTouchClient.getInstance().getDefaultMailbox().fetchMessages();
             LoginActivity.this.finish();
         }
     };
