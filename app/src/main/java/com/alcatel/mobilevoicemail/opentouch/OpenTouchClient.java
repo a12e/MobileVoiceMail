@@ -9,6 +9,8 @@ import com.alcatel.mobilevoicemail.App;
 import com.alcatel.mobilevoicemail.opentouch.exceptions.AuthenticationException;
 import com.alcatel.mobilevoicemail.opentouch.exceptions.ProtocolException;
 
+import org.apache.http.HttpException;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedInputStream;
@@ -21,6 +23,7 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.CookieHandler;
 import java.net.CookieManager;
+import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.List;
 import java.util.Map;
@@ -83,6 +86,36 @@ public class OpenTouchClient {
         }
     }
 
+    public JSONObject getJson(String relativeUrl) throws JSONException, IOException, HttpException {
+        return requestJson("GET", relativeUrl, "");
+    }
+
+    public JSONObject requestJson(String httpVerb, String relativeUrl, String postData) throws IOException, JSONException, HttpException {
+        HttpsURLConnection connection = createHTTPSConnection(httpVerb, relativeUrl);
+        connection.setRequestProperty("Content-Type", "application/json");
+        connection.setRequestProperty("Accept", "application/json");
+
+        // We accept incoming data
+        connection.setDoInput(true);
+        if(!postData.isEmpty()) {
+            // We open the stream to the server
+            connection.setDoOutput(true);
+            writeToStream(connection, postData);
+        }
+
+        connection.connect();
+        BufferedInputStream is = new BufferedInputStream(connection.getInputStream());
+        String response = readFromStream(is);
+        connection.disconnect();
+
+        if(connection.getResponseCode() != HttpURLConnection.HTTP_OK) {
+            throw new HttpException();
+        }
+
+        // Convert to JSON
+        return new JSONObject(response);
+    }
+
     class LoginTask extends AsyncTask<String, Void, Void> {
         protected Void doInBackground(String... params) {
             try {
@@ -123,24 +156,11 @@ public class OpenTouchClient {
 
                 connection2.disconnect();
 
-                HttpsURLConnection connection3 = createHTTPSConnection("POST", "/1.0/sessions");
-                connection3.setRequestProperty("Content-Type", "application/json");
-                connection3.setDoOutput(true);
-                connection3.connect();
-                writeToStream(connection3, "{\"application\": \"MobileVoiceMail\"}");
-                printHTTPHeaders(getClass().getSimpleName(), connection3);
-                connection3.disconnect();
+                requestJson("POST", "/1.0/sessions", "{\"application\": \"MobileVoiceMail\"}");
 
-                HttpsURLConnection connection4 = createHTTPSConnection("GET", "/1.0/logins");
-                connection4.setRequestProperty("Content-Type", "application/json");
-                connection4.setDoInput(true);
-                connection4.connect();
-                if(connection4.getResponseCode() == 200) {
-                    BufferedInputStream is = new BufferedInputStream(connection4.getInputStream());
-                    String data = OpenTouchClient.readFromStream(is);
-                    mLoginName = new JSONObject(data).getJSONArray("loginNames").get(0).toString();
-                }
-                connection4.disconnect();
+                JSONObject logins = getJson("/1.0/logins");
+                mLoginName = logins.getJSONArray("loginNames").get(0).toString();
+                Log.i(getClass().getSimpleName(), "Now connected with login name " + mLoginName);
 
                 // Connection successful
                 App.getContext().sendBroadcast(new Intent("LOGIN_SUCCESS"));
@@ -194,9 +214,6 @@ public class OpenTouchClient {
                 disconnect1.connect();
                 printHTTPHeaders(getClass().getSimpleName(), disconnect1);
                 //disconnect1.disconnect();
-
-
-
 
                 // We expect a 204
                 if(disconnect1.getResponseCode() != 204) {
