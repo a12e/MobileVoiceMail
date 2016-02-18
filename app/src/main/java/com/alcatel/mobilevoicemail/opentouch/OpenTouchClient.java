@@ -26,6 +26,7 @@ import java.io.OutputStreamWriter;
 import java.net.CookieHandler;
 import java.net.CookieManager;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
 import java.util.Map;
@@ -35,7 +36,7 @@ import javax.net.ssl.HttpsURLConnection;
 public class OpenTouchClient {
 
     private static OpenTouchClient mInstance = null;
-    private String mBaseUrl = "https://192.168.1.55:443/api/rest"; // "https://tps-opentouch.u-strasbg.fr/api/rest"
+    private String mBaseUrl = "https://192.168.1.47:4430/api/rest"; // "https://tps-opentouch.u-strasbg.fr/api/rest"
     private String mLoginName = null;
     private CookieManager mCookieStore;
     private Mailbox mDefaultMailbox;
@@ -199,6 +200,7 @@ public class OpenTouchClient {
 
                 // Connection successful
                 App.getContext().sendBroadcast(new Intent("LOGIN_SUCCESS"));
+                subscribe(mBaseUrl + "/1.0/subscriptions");
                 return null;
             }
             catch(Exception e) {
@@ -284,4 +286,76 @@ public class OpenTouchClient {
 
     }
 
+    void subscribe(String url) {
+        try {
+            // i.e.: request = "http://example.com/index.php?param1=a&param2=b&param3=c";
+            Log.d(getClass().getSimpleName(), "==== POST :" + url);
+            URL object = new URL(url);
+            HttpsURLConnection urlConnection  = (HttpsURLConnection) object.openConnection();
+
+            urlConnection.setDoOutput(true);
+            urlConnection.setDoInput(true);
+            urlConnection.setRequestProperty("Content-Type", "application/json");
+            urlConnection.setRequestProperty("Accept", "application/json");
+            urlConnection.setRequestMethod("POST");
+
+            JSONArray user_id = new JSONArray();
+            user_id.put(getLoginName());
+
+            JSONArray telephony = new JSONArray();
+            telephony.put("telephony");
+
+            JSONArray unifiedComLog = new JSONArray();
+            unifiedComLog.put("unifiedComLog");
+
+            JSONArray vide = new JSONArray();
+
+            JSONObject id1 = new JSONObject();
+            id1.put("ids",user_id);
+            id1.put("names",telephony);
+            id1.put("families",vide);
+            id1.put("origins",vide);
+
+            JSONObject id2 = new JSONObject();
+            id2.put("ids",user_id);
+            id2.put("names",unifiedComLog);
+            id2.put("families",vide);
+            id2.put("origins",vide);
+
+            JSONArray id = new JSONArray();
+            id.put(id1);
+            id.put(id2);
+
+            JSONObject selectors = new JSONObject();
+            selectors.put("selectors", id);
+
+            JSONObject filter = new JSONObject();
+            filter.put("filter", selectors);
+            filter.put("mode","CHUNK");
+            filter.put("format","JSON");
+            filter.put("version", "1.0");
+            filter.put("timeout", 10);
+
+            OpenTouchClient.writeToStream(urlConnection, filter.toString());
+
+            int HttpResult =urlConnection.getResponseCode();
+            if(HttpResult == HttpURLConnection.HTTP_OK){
+                System.out.println("*=*=*=*=*=*=*=* Succès ! *=*=*=*=*=*=*=*");
+
+            }else{
+                System.out.println(urlConnection.getResponseMessage());
+            }
+        }
+        catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+        catch (IOException e) {
+
+            e.printStackTrace();
+        }
+        catch (JSONException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
 }
