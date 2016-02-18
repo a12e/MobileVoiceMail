@@ -33,10 +33,13 @@ import javax.net.ssl.HttpsURLConnection;
 public class OpenTouchClient {
 
     private static OpenTouchClient mInstance = null;
-    private String mBaseUrl = "https://tps-opentouch.u-strasbg.fr/api/rest";
+    private String mBaseUrl = "https://192.168.1.55:443/api/rest"; // "https://tps-opentouch.u-strasbg.fr/api/rest"
     private String mLoginName = null;
+
+    private CookieManager mCookieStore;
     private OpenTouchClient() {
-        CookieHandler.setDefault(new CookieManager());
+        mCookieStore = new CookieManager();
+        CookieHandler.setDefault(mCookieStore); //BAKUP CookieHandler.setDefault(new CookieManager());
         HttpsURLConnection.setFollowRedirects(false);
         TrustEveryone.trustEveryone();
     }
@@ -182,44 +185,18 @@ public class OpenTouchClient {
         protected Void doInBackground(String... params) {
             try {
                 // Disconnect
-               // disconnect1.setDoInput(true);
-                /*  disconnect1.setDoOutput(true);
-                disconnect1.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
-                disconnect1.setRequestMethod("DELETE");
-                disconnect1.connect();
-                //disconnect1.getContent();
-                printHTTPHeaders(getClass().getSimpleName(), disconnect1);
-                disconnect1.getInputStream();
-                disconnect1.disconnect();;
-
-              disconnect1.setDoInput(true);
-                disconnect1.setInstanceFollowRedirects(false);
-                disconnect1.setRequestMethod("DELETE");
-                disconnect1.setUseCaches(false);
-                printHTTPHeaders(getClass().getSimpleName(), disconnect1);
-               // connection1.getContent();
-               disconnect1.disconnect();*/
-
-               // disconnect1.setDoOutput(true);
-               // disconnect1.setRequestMethod("DELETE");
-
-                //disconnect1.connect();
-                //printHTTPHeaders(getClass().getSimpleName(), disconnect1);
-                /* CODE AVEC 403*/
-
-
                 HttpsURLConnection disconnect1 = createHTTPSConnection("DELETE", "/1.0/sessions");
                 disconnect1.setRequestProperty("Accept", "application/json, application/xml, text/json, text/x-json, text/javascript, text/xml");
                 disconnect1.setRequestProperty("Content-Type", "application/json");
                 disconnect1.connect();
                 printHTTPHeaders(getClass().getSimpleName(), disconnect1);
-                //disconnect1.disconnect();
+                mCookieStore.getCookieStore().removeAll();
 
                 // We expect a 204
                 if(disconnect1.getResponseCode() != 204) {
                     throw new ProtocolException("Expected a 204 response code");
                 }
-                // Connection successful
+                // Connection successful cf http://developer.android.com/reference/java/net/CookieStore.html y a removeALL
                 App.getContext().sendBroadcast(new Intent("LOGOUT_SUCCESS"));
                 return null;
             }
