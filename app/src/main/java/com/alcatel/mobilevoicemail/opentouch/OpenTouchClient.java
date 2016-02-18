@@ -176,7 +176,6 @@ public class OpenTouchClient {
                 connection2.setRequestProperty("Authorization", "Basic " + encoded);
                 connection2.setDoInput(true);
                 connection2.connect();
-                printHTTPHeaders(getClass().getSimpleName(), connection2);
 
                 if(connection2.getResponseCode() == 401) {
                     BufferedInputStream is = new BufferedInputStream(connection2.getErrorStream());

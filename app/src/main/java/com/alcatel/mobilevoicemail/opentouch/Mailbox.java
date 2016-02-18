@@ -1,14 +1,17 @@
 package com.alcatel.mobilevoicemail.opentouch;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.AsyncTask;
 import android.util.Log;
 
-import org.apache.http.HttpException;
+import com.alcatel.mobilevoicemail.App;
+
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.IOException;
 import java.util.ArrayList;
 
 public class Mailbox {
@@ -17,6 +20,16 @@ public class Mailbox {
 
     public Mailbox(int mailboxId) {
         this.mId = mailboxId;
+
+        BroadcastReceiver mMessageUploadedReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                ArrayList<Identifier> destinations = new ArrayList<>();
+                destinations.add(new Identifier(OpenTouchClient.getInstance().getLoginName()));
+                sendMessage(destinations, false, intent.getStringExtra("url"));
+            }
+        };
+        App.getContext().registerReceiver(mMessageUploadedReceiver, new IntentFilter("MESSAGE_UPLOADED"));
     }
 
     private class FetchMessagesTask extends AsyncTask<Void, Void, Void> {
@@ -49,8 +62,13 @@ public class Mailbox {
             SendMessageParams parameters = params[0];
 
             try {
+                JSONArray destinations = new JSONArray();
+                for(Identifier identifier: parameters.destinations) {
+                    destinations.put(identifier.toJson());
+                }
+
                 JSONObject request = new JSONObject();
-                request.put("destinations", parameters.destinations);
+                request.put("destinations", destinations);
                 request.put("highPriority", parameters.highPriority);
                 request.put("url", parameters.url);
 
