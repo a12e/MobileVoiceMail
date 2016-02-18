@@ -4,6 +4,8 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import com.alcatel.mobilevoicemail.opentouch.Identifier;
+import com.alcatel.mobilevoicemail.opentouch.OpenTouchClient;
 import com.dropbox.client2.DropboxAPI;
 import com.dropbox.client2.android.AndroidAuthSession;
 import com.dropbox.client2.exception.DropboxException;
@@ -12,6 +14,7 @@ import com.dropbox.client2.session.AppKeyPair;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 
 public class DropboxClient {
     private static DropboxClient instance = null;
@@ -41,9 +44,9 @@ public class DropboxClient {
         mDBApi.getSession().startOAuth2Authentication(context);
     }
 
-    private class UploadFileTask extends AsyncTask<String, Void, Void> {
+    private class UploadFileTask extends AsyncTask<String, Void, String> {
         @Override
-        protected Void doInBackground(String... params) {
+        protected String doInBackground(String... params) {
             if(params.length != 1) {
                 throw new IllegalArgumentException("Only one paramter please");
             }
@@ -70,8 +73,11 @@ public class DropboxClient {
                 DropboxAPI.DropboxLink link = mDBApi.share(newEntry.path);
                 Log.i(getClass().getSimpleName(), "URL is " + link.url);
 
+                OpenTouchClient.getInstance().getDefaultMailbox().sendMessage(new ArrayList<Identifier>(), false, link.url);
+
+                return link.url;
             } catch (Exception e) {
-                System.out.println("Something went wrong: " + e);
+                Log.e(getClass().getSimpleName(), "Something went wrong: " + e);
             } finally {
                 if (inputStream != null) {
                     try {
@@ -79,7 +85,15 @@ public class DropboxClient {
                     } catch (IOException e) {}
                 }
             }
-            return null;
+
+            return "";
+        }
+
+        @Override
+        protected void onPostExecute(String dropboxUrl) {
+            super.onPostExecute(dropboxUrl);
+
+
         }
     }
 
