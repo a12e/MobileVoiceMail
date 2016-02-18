@@ -1,6 +1,7 @@
 package com.alcatel.mobilevoicemail;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.util.Log;
 
@@ -14,7 +15,10 @@ import com.dropbox.client2.session.AppKeyPair;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
+
+import javax.net.ssl.HttpsURLConnection;
 
 public class DropboxClient {
     private static DropboxClient instance = null;
@@ -44,9 +48,9 @@ public class DropboxClient {
         mDBApi.getSession().startOAuth2Authentication(context);
     }
 
-    private class UploadFileTask extends AsyncTask<String, Void, String> {
+    private class UploadFileTask extends AsyncTask<String, Void, Void> {
         @Override
-        protected String doInBackground(String... params) {
+        protected Void doInBackground(String... params) {
             if(params.length != 1) {
                 throw new IllegalArgumentException("Only one paramter please");
             }
@@ -71,11 +75,20 @@ public class DropboxClient {
                 Log.i(getClass().getSimpleName(), "Sharing it");
 
                 DropboxAPI.DropboxLink link = mDBApi.share(newEntry.path);
-                Log.i(getClass().getSimpleName(), "URL is " + link.url);
+                Log.i(getClass().getSimpleName(), "Dropbox shorten URL is " + link.url);
 
-                OpenTouchClient.getInstance().getDefaultMailbox().sendMessage(new ArrayList<Identifier>(), false, link.url);
+                // We now need to get the real URL of the message, beaucase Dropbox provides a shorten URL
+                HttpsURLConnection connection = (HttpsURLConnection)new URL(link.url).openConnection();
+                connection.setInstanceFollowRedirects(false);
+                connection.connect();
+                // Get the target URL of the shorten link
+                String realURL = connection.getHeaderField("Location").replace("?dl=0", "?dl=1");
+                Log.i(getClass().getSimpleName(), "Dropbox real URL is " + realURL);
 
-                return link.url;
+                // Notify the app that the message has been successfully sent to Dropbox
+                Intent messageUploadedIntent = new Intent("MESSAGE_UPLOADED");
+                messageUploadedIntent.putExtra("url", realURL);
+                App.getContext().sendBroadcast(messageUploadedIntent);
             } catch (Exception e) {
                 Log.e(getClass().getSimpleName(), "Something went wrong: " + e);
             } finally {
@@ -86,14 +99,7 @@ public class DropboxClient {
                 }
             }
 
-            return "";
-        }
-
-        @Override
-        protected void onPostExecute(String dropboxUrl) {
-            super.onPostExecute(dropboxUrl);
-
-
+            return null;
         }
     }
 

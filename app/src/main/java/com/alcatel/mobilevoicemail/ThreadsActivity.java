@@ -39,6 +39,15 @@ public class ThreadsActivity extends ActionBarActivity {
                 startActivity(itent_deconnexion);
             }
         });
+
+        //Recherche de la liste de contact
+        Button mContacts = (Button) findViewById(R.id.SearchContact);
+        mContacts.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                OpenTouchClient.getInstance().getContactsOpenTouch();
+            }
+        });
     }
 
 }
