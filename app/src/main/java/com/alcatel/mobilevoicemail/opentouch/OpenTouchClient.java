@@ -26,6 +26,7 @@ import java.io.OutputStreamWriter;
 import java.net.CookieHandler;
 import java.net.CookieManager;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
 import java.util.Map;
@@ -48,7 +49,7 @@ public class OpenTouchClient {
     }
 
     public static OpenTouchClient getInstance() {
-        if(mInstance == null)
+        if (mInstance == null)
             mInstance = new OpenTouchClient();
         return mInstance;
     }
@@ -63,7 +64,7 @@ public class OpenTouchClient {
 
     public HttpsURLConnection createHTTPSConnection(String method, String relativeUrl) throws IOException {
         URL url = new URL(mBaseUrl + relativeUrl);
-        HttpsURLConnection urlConnection = (HttpsURLConnection)url.openConnection();
+        HttpsURLConnection urlConnection = (HttpsURLConnection) url.openConnection();
         urlConnection.setRequestMethod(method);
         return urlConnection;
     }
@@ -91,7 +92,7 @@ public class OpenTouchClient {
 
     public static void printHTTPHeaders(String tag, HttpsURLConnection connection) {
         Log.d(tag, "==== REQUEST " + connection.getURL().toString());
-        for(Map.Entry<String, List<String>> entry : connection.getHeaderFields().entrySet()) {
+        for (Map.Entry<String, List<String>> entry : connection.getHeaderFields().entrySet()) {
             Log.d(tag, entry.getKey() + ": " + entry.getValue().toString());
         }
     }
@@ -109,7 +110,7 @@ public class OpenTouchClient {
 
         // We accept incoming data
         connection.setDoInput(true);
-        if(!postData.isEmpty()) {
+        if (!postData.isEmpty()) {
             // We open the stream to the server
             connection.setDoOutput(true);
             writeToStream(connection, postData);
@@ -152,7 +153,7 @@ public class OpenTouchClient {
     class LoginTask extends AsyncTask<String, Void, Void> {
         protected Void doInBackground(String... params) {
             try {
-                if(params.length != 2) {
+                if (params.length != 2) {
                     throw new IllegalArgumentException();
                 }
                 String email = params[0];
@@ -168,21 +169,20 @@ public class OpenTouchClient {
                 connection1.disconnect();
 
                 // We expect a 302
-                if(connection1.getResponseCode() != 302) {
+                if (connection1.getResponseCode() != 302) {
                     throw new ProtocolException("Expected a 302 response code");
                 }
                 String location = connection1.getHeaderField("Location");
 
                 // Phase 2
                 URL url2 = new URL(location);
-                HttpsURLConnection connection2 = (HttpsURLConnection)url2.openConnection();
+                HttpsURLConnection connection2 = (HttpsURLConnection) url2.openConnection();
                 String encoded = Base64.encodeToString((email + ":" + password).getBytes("UTF-8"), Base64.NO_WRAP);
                 connection2.setRequestProperty("Authorization", "Basic " + encoded);
                 connection2.setDoInput(true);
                 connection2.connect();
-                printHTTPHeaders(getClass().getSimpleName(), connection2);
 
-                if(connection2.getResponseCode() == 401) {
+                if (connection2.getResponseCode() == 401) {
                     BufferedInputStream is = new BufferedInputStream(connection2.getErrorStream());
                     String result = readFromStream(is);
                     Log.d(getClass().getSimpleName(), "RESULT " + result);
@@ -204,9 +204,9 @@ public class OpenTouchClient {
 
                 // Connection successful
                 App.getContext().sendBroadcast(new Intent("LOGIN_SUCCESS"));
+                subscribe("/1.0/subscriptions");
                 return null;
-            }
-            catch(Exception e) {
+            } catch (Exception e) {
                 // Connection error
                 Log.e(getClass().getSimpleName(), "Connection error");
                 Log.e(getClass().getSimpleName(), e.toString());
@@ -228,14 +228,13 @@ public class OpenTouchClient {
                 mCookieStore.getCookieStore().removeAll();
 
                 // We expect a 204
-                if(disconnect1.getResponseCode() != 204) {
+                if (disconnect1.getResponseCode() != 204) {
                     throw new ProtocolException("Expected a 204 response code");
                 }
                 // Connection successful cf http://developer.android.com/reference/java/net/CookieStore.html y a removeALL
                 App.getContext().sendBroadcast(new Intent("LOGOUT_SUCCESS"));
                 return null;
-            }
-            catch(Exception e) {
+            } catch (Exception e) {
                 // Connection error
                 Log.e(getClass().getSimpleName(), "Log out error");
                 Log.e(getClass().getSimpleName(), e.toString());
@@ -266,8 +265,7 @@ public class OpenTouchClient {
                     throw new ProtocolException("Expected a 204 response code");
                 }*/
                 // Connection successful cf http://developer.android.com/reference/java/net/CookieStore.html y a removeALL
-            }
-            catch(Exception e) {
+            } catch (Exception e) {
                 // Connection error
                 Log.e(getClass().getSimpleName(), "Get contacts error");
                 Log.e(getClass().getSimpleName(), e.toString());
@@ -288,10 +286,66 @@ public class OpenTouchClient {
         new LogOutTask().execute();
     }
 
-    public void getContactsOpenTouch(){
+    public void getContactsOpenTouch() {
         Log.i(getClass().getSimpleName(), "Starting getting all contacts from Opentouch");
         new getContactsOpenTouchTask().execute();
 
     }
 
+
+    void subscribe(String relativeUrl) {
+        try {
+            // i.e.: request = "http://example.com/index.php?param1=a&param2=b&param3=c";
+            Log.d(getClass().getSimpleName(), "==== POST :" + mBaseUrl + relativeUrl);
+            JSONArray user_id = new JSONArray();
+            user_id.put(getLoginName());
+
+            JSONArray telephony = new JSONArray();
+            telephony.put("telephony");
+
+            JSONArray unifiedComLog = new JSONArray();
+            unifiedComLog.put("unifiedComLog");
+
+            JSONArray vide = new JSONArray();
+
+            JSONObject id1 = new JSONObject();
+            id1.put("ids", user_id);
+            id1.put("names", telephony);
+            id1.put("families", vide);
+            id1.put("origins", vide);
+
+            JSONObject id2 = new JSONObject();
+            id2.put("ids", user_id);
+            id2.put("names", unifiedComLog);
+            id2.put("families", vide);
+            id2.put("origins", vide);
+
+            JSONArray id = new JSONArray();
+            id.put(id1);
+            id.put(id2);
+
+            JSONObject selectors = new JSONObject();
+            selectors.put("selectors", id);
+
+            JSONObject filter = new JSONObject();
+            filter.put("filter", selectors);
+            filter.put("mode", "CHUNK");
+            filter.put("format", "JSON");
+            filter.put("version", "1.0");
+            filter.put("timeout", 10);
+            JSONObject response = requestJson("POST", relativeUrl, filter.toString());
+            Log.d(getClass().getSimpleName(), "*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-* : " + response);
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (JSONException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (HttpException e) {
+            e.printStackTrace();
+        } catch (ProtocolException e) {
+            e.printStackTrace();
+        }
+    }
 }
