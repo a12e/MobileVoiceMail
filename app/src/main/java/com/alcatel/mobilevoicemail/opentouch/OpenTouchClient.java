@@ -118,7 +118,8 @@ public class OpenTouchClient {
         connection.connect();
         String response = "{}";
 
-        if(connection.getResponseCode() != HttpURLConnection.HTTP_NO_CONTENT) {
+        if(connection.getResponseCode() != HttpURLConnection.HTTP_NO_CONTENT
+           && connection.getResponseCode() != HttpURLConnection.HTTP_CREATED) {
             try {
                 BufferedInputStream is = new BufferedInputStream(connection.getInputStream());
                 response = readFromStream(is);
@@ -129,7 +130,9 @@ public class OpenTouchClient {
         }
 
         if(connection.getResponseCode() != HttpURLConnection.HTTP_OK
-                && connection.getResponseCode() != HttpURLConnection.HTTP_NO_CONTENT) {
+                && connection.getResponseCode() != HttpURLConnection.HTTP_NO_CONTENT
+                && connection.getResponseCode() != HttpURLConnection.HTTP_CREATED
+                && response.equals("{}")) {
             BufferedInputStream is = new BufferedInputStream(connection.getErrorStream());
             response = readFromStream(is);
             JSONObject error = new JSONObject(response);
@@ -154,6 +157,8 @@ public class OpenTouchClient {
                 }
                 String email = params[0];
                 String password = params[1];
+
+                mCookieStore.getCookieStore().removeAll();
 
                 // Phase 1
                 HttpsURLConnection connection1 = createHTTPSConnection("GET", "/authenticate");
@@ -247,6 +252,12 @@ public class OpenTouchClient {
                 //requestJson("POST", "/1.0/directory/search", "{\"directory\":null,\"limit\":0,\"filter\":{\"field\":\"lastName\",\"operand\":\"\",\"operation\":\"CONTAIN\"}}");
                 requestJson("POST", "/1.0/directory/search", "{\"directory\":null,\"limit\":0,\"filter\":{\"field\":\"lastName\",\"operand\":\"t\",\"operation\":\"CONTAIN\"}}");
 
+
+                HttpsURLConnection connection1 = createHTTPSConnection("GET", "/1.0/directory/search");
+                connection1.setDoInput(true);
+                connection1.connect();
+                connection1.getContent();
+                connection1.disconnect();
                 //App.getContext().sendBroadcast(new Intent("GETCONTACT_SUCCESS"));
                 return null;
 
@@ -272,9 +283,8 @@ public class OpenTouchClient {
         new LoginTask().execute(email, password);
     }
 
-    public void logout(){
+    public void logout() {
         Log.i(getClass().getSimpleName(), "Starting logout");
-        // OpenTouchClient.getInstance().getContactsOpenTouch();
         new LogOutTask().execute();
     }
 
