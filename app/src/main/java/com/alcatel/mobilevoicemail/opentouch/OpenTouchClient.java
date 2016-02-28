@@ -36,7 +36,8 @@ import javax.net.ssl.HttpsURLConnection;
 public class OpenTouchClient {
 
     private static OpenTouchClient mInstance = null;
-    private String mBaseUrl = "https://192.168.1.55:443/api/rest"; // "https://tps-opentouch.u-strasbg.fr/api/rest"
+    //private String mBaseUrl = "https://192.168.1.12:4430/api/rest";
+    private String mBaseUrl = "https://tps-opentouch.u-strasbg.fr/api/rest";
     private String mLoginName = null;
     private CookieManager mCookieStore;
     private Mailbox mDefaultMailbox;
@@ -251,7 +252,6 @@ public class OpenTouchClient {
                 //requestJson("POST", "/1.0/directory/search", "{\"directory\":null,\"limit\":0,\"filter\":{\"field\":\"lastName\",\"operand\":\"\",\"operation\":\"CONTAIN\"}}");
                 requestJson("POST", "/1.0/directory/search", "{\"directory\":null,\"limit\":0,\"filter\":{\"field\":\"lastName\",\"operand\":\"t\",\"operation\":\"CONTAIN\"}}");
 
-
                 HttpsURLConnection connection1 = createHTTPSConnection("GET", "/1.0/directory/search");
                 connection1.setDoInput(true);
                 connection1.connect();
@@ -291,7 +291,6 @@ public class OpenTouchClient {
         new getContactsOpenTouchTask().execute();
 
     }
-
 
     void subscribe(String relativeUrl) {
         try {
@@ -334,6 +333,7 @@ public class OpenTouchClient {
             filter.put("version", "1.0");
             filter.put("timeout", 10);
             JSONObject response = requestJson("POST", relativeUrl, filter.toString());
+
             Log.d(getClass().getSimpleName(), "*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-* : " + response);
         } catch (MalformedURLException e) {
             e.printStackTrace();

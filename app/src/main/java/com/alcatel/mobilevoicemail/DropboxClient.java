@@ -20,6 +20,8 @@ import java.util.ArrayList;
 
 import javax.net.ssl.HttpsURLConnection;
 
+import static java.net.URLDecoder.decode;
+
 public class DropboxClient {
     private static DropboxClient instance = null;
 
@@ -68,8 +70,8 @@ public class DropboxClient {
             try {
                 File file = new File(params[0]);
                 inputStream = new FileInputStream(file);
-                DropboxAPI.Entry newEntry = mDBApi.putFile("test.wav", inputStream, file.length(),
-                        null, null);
+                DropboxAPI.Entry newEntry = mDBApi.putFile(file.getName(), inputStream,
+                        file.length(), null, null);
 
                 Log.i(getClass().getSimpleName(), "Uploaded file path is " + newEntry.path);
                 Log.i(getClass().getSimpleName(), "Sharing it");
@@ -83,6 +85,7 @@ public class DropboxClient {
                 connection.connect();
                 // Get the target URL of the shorten link
                 String realURL = connection.getHeaderField("Location").replace("?dl=0", "?dl=1");
+                realURL = decode(realURL, "UTF-8");
                 Log.i(getClass().getSimpleName(), "Dropbox real URL is " + realURL);
 
                 // Notify the app that the message has been successfully sent to Dropbox

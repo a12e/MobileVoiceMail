@@ -17,6 +17,7 @@ import java.util.ArrayList;
 public class Mailbox {
 
     protected int mId;
+    private ArrayList<Voicemail> mVoicemails;
 
     public Mailbox(int mailboxId) {
         this.mId = mailboxId;
@@ -32,6 +33,10 @@ public class Mailbox {
         App.getContext().registerReceiver(mMessageUploadedReceiver, new IntentFilter("MESSAGE_UPLOADED"));
     }
 
+    public ArrayList<Voicemail> getVoicemails() {
+        return null;
+    }
+
     private class FetchMessagesTask extends AsyncTask<Void, Void, Void> {
         @Override
         protected Void doInBackground(Void... params) {
@@ -39,8 +44,24 @@ public class Mailbox {
 
             try {
                 // Get all messages from this mailbox
-                JSONObject messages = OpenTouchClient.getInstance().getJson("/1.0/messaging/mailboxes/" + mId + "/voicemails");
-                Log.i(getClass().getSimpleName(), "Messages list " + messages);
+                JSONObject response = OpenTouchClient.getInstance().getJson("/1.0/messaging/mailboxes/" + mId + "/voicemails");
+                JSONArray voicemails = response.getJSONArray("voicemails");
+                for(int i = 0; i < voicemails.length(); i++) {
+                    Voicemail freshVoicemail = Voicemail.fromJson(voicemails.getJSONObject(i));
+
+                    for(Voicemail storedVoicemail: mVoicemails) {
+                        if(freshVoicemail.getId() == storedVoicemail.getId()) {
+                            mVoicemails.remove(storedVoicemail);
+                        }
+                    }
+
+                    mVoicemails.add(freshVoicemail);
+                }
+
+                Log.i(getClass().getSimpleName(), "Messages received " + voicemails.toString());
+
+                App.getContext().sendBroadcast(new Intent("MAILBOX_SYNC"));
+
             } catch (Exception e) {
                 e.printStackTrace();
             }

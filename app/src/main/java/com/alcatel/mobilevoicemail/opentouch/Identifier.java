@@ -13,6 +13,14 @@ public class Identifier {
         this.mLoginName = loginName;
     }
 
+    public static Identifier fromJson(JSONObject object) throws JSONException {
+        Identifier identifier = new Identifier(object.getString("loginName"));
+        identifier.mPhoneNumber = object.getString("phoneNumber");
+        identifier.mInstantMessagingId = object.getString("instantMessagingId");
+        identifier.mCompanyEmail = object.getString("companyEmail");
+        return identifier;
+    }
+
     public JSONObject toJson() throws JSONException {
         JSONObject object = new JSONObject();
         object.put("loginName", mLoginName);
