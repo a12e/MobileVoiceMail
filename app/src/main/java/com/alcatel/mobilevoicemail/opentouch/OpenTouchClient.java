@@ -335,6 +335,16 @@ public class OpenTouchClient {
             JSONObject response = requestJson("POST", relativeUrl, filter.toString());
 
             Log.d(getClass().getSimpleName(), "*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-* : " + response);
+            String subscriptionId = response.getString("subscriptionId");
+            String publicPollingUrl = response.getString("publicPollingUrl");
+            String privatePollingUrl = response.getString("privatePollingUrl");
+            /*URL url = new URL(publicPollingUrl);
+            HttpsURLConnection urlConnection = (HttpsURLConnection) url.openConnection();
+            urlConnection.setRequestMethod("GET");
+            urlConnection.setDoInput(true);
+            urlConnection.connect();
+            urlConnection.getContent();
+            urlConnection.disconnect();*/
         } catch (MalformedURLException e) {
             e.printStackTrace();
         } catch (IOException e) {
