@@ -4,7 +4,6 @@ import android.app.AlertDialog;
 import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.MediaRecorder;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v7.app.ActionBarActivity;
@@ -12,13 +11,9 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
-import com.dropbox.client2.DropboxAPI;
-import com.dropbox.client2.android.AndroidAuthSession;
-import com.dropbox.client2.exception.DropboxException;
 import com.intervigil.wave.WaveWriter;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 
 public class RecordMessageActivity extends ActionBarActivity {
@@ -34,6 +29,7 @@ public class RecordMessageActivity extends ActionBarActivity {
     Boolean mRecording = false;
     private Button mRecordButton = null;
     Thread mWriterThread;
+    private String mRecordedMessagePath;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,13 +67,40 @@ public class RecordMessageActivity extends ActionBarActivity {
             alertDialog.show();
         }
         mBuffer = new short[mBufferSize];
+
+        final LocalVoicemail localVoicemail = new LocalVoicemail();
+        mRecordedMessagePath = localVoicemail.getPath();
+        Log.i(getClass().getSimpleName(), "Will write into wave file " + mRecordedMessagePath);
+
         mAudioRecord.startRecording();
         mRecording = true;
-        Log.i("recorder", "Started recording");
+        Log.i(getClass().getSimpleName(), "Started recording");
 
         mWriterThread = new Thread(new Runnable() {
             public void run() {
-                writeAudioDataToFile();
+                WaveWriter writer = new WaveWriter(new File(localVoicemail.getPath()),
+                        RECORDER_SAMPLERATE, RECORDER_CHANNELS_COUNT, RECORDER_SAMPLEBITS);
+                try {
+                    writer.createWaveFile();
+                    Log.i(getClass().getSimpleName(), "Created wave file");
+                    while(mAudioRecord.getRecordingState() == AudioRecord.RECORDSTATE_RECORDING){
+                        int numSamples = mAudioRecord.read(mBuffer, 0, mBuffer.length);
+
+                        if(numSamples == AudioRecord.ERROR_INVALID_OPERATION) {
+                            Log.e(getClass().getSimpleName(), "AudioRecord.ERROR_INVALID_OPERATION (not initialized)");
+                        }
+                        else if(numSamples == AudioRecord.ERROR_BAD_VALUE) {
+                            Log.e(getClass().getSimpleName(), "AudioRecord.ERROR_BAD_VALUE");
+                        }
+                        else {
+                            writer.write(mBuffer, 0, numSamples);
+                        }
+                    }
+                    writer.closeWaveFile();
+                    Log.i(getClass().getSimpleName(), "Finished writing into wave file");
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
         }, "AudioRecorder Thread");
         mWriterThread.start();
@@ -99,34 +122,7 @@ public class RecordMessageActivity extends ActionBarActivity {
         //DropboxClient.getInstance().startOAuth2Authentication(RecordMessageActivity.this);
 
         Log.i(getClass().getSimpleName(), "Sending message to Dropbox");
-        DropboxClient.getInstance().putFile(Environment.getExternalStorageDirectory().getPath()
-                + "/test.wav");
-    }
-
-    private void writeAudioDataToFile() {
-        WaveWriter writer = new WaveWriter(Environment.getExternalStorageDirectory().getPath(),
-                "test.wav", RECORDER_SAMPLERATE, RECORDER_CHANNELS_COUNT, RECORDER_SAMPLEBITS);
-        try {
-            writer.createWaveFile();
-            Log.i("recorder", "Created wave file");
-            while(mAudioRecord.getRecordingState() == AudioRecord.RECORDSTATE_RECORDING){
-                int numSamples = mAudioRecord.read(mBuffer, 0, mBuffer.length);
-
-                if(numSamples == AudioRecord.ERROR_INVALID_OPERATION) {
-                    Log.e("recorder", "AudioRecord.ERROR_INVALID_OPERATION (not initialized)");
-                }
-                else if(numSamples == AudioRecord.ERROR_BAD_VALUE) {
-                    Log.e("recorder", "AudioRecord.ERROR_BAD_VALUE");
-                }
-                else {
-                    writer.write(mBuffer, 0, numSamples);
-                }
-            }
-            writer.closeWaveFile();
-            Log.i("recorder", "Finished writing wave file");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        DropboxClient.getInstance().putFile(mRecordedMessagePath);
     }
 
     protected void onResume() {
@@ -142,8 +138,7 @@ public class RecordMessageActivity extends ActionBarActivity {
                 Log.i("DbAuthLog", "Error authenticating", e);
             }
 
-            DropboxClient.getInstance().putFile(Environment.getExternalStorageDirectory().getPath()
-                    + "/test.wav");
+            DropboxClient.getInstance().putFile(mRecordedMessagePath);
         }
     }
 }

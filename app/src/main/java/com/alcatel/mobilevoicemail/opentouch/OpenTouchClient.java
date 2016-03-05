@@ -253,7 +253,6 @@ public class OpenTouchClient {
                 //requestJson("POST", "/1.0/directory/search", "{\"directory\":null,\"limit\":0,\"filter\":{\"field\":\"lastName\",\"operand\":\"\",\"operation\":\"CONTAIN\"}}");
                 requestJson("POST", "/1.0/directory/search", "{\"directory\":null,\"limit\":0,\"filter\":{\"field\":\"lastName\",\"operand\":\"t\",\"operation\":\"CONTAIN\"}}");
 
-
                 HttpsURLConnection connection1 = createHTTPSConnection("GET", "/1.0/directory/search");
                 connection1.setDoInput(true);
                 connection1.connect();
