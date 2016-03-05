@@ -74,7 +74,7 @@ public class Mailbox {
 
                 Log.i(getClass().getSimpleName(), "sendMessage request: " + request.toString());
                 JSONObject response = OpenTouchClient.getInstance().requestJson("POST",
-                        "/1.0/messaging/mailboxes/" + mId + "/recorder/send", request.toString());
+                        "/1.0/messaging/mailboxes/" + mId + "/recorder/send", request.toString().replace("\\", ""));
                 Log.i(getClass().getSimpleName(), "sendMessage response: " + response.toString());
             } catch (Exception e) {
                 e.printStackTrace();

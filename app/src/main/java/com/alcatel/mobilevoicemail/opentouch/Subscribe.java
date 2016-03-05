@@ -95,20 +95,7 @@ public class Subscribe {
                 }
             }
             Log.d(getClass().getSimpleName(), "*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-* : " + responsePolling);
-
-          /*  if(urlConnection.getResponseCode() != HttpURLConnection.HTTP_OK
-                    && urlConnection.getResponseCode() != HttpURLConnection.HTTP_NO_CONTENT
-                    && urlConnection.getResponseCode() != HttpURLConnection.HTTP_CREATED
-                    && response.equals("{}")) {
-                BufferedInputStream is = new BufferedInputStream(urlConnection.getErrorStream());
-                responsePolling = readFromStream(is);
-                JSONObject error = new JSONObject(responsePolling);
-                Log.e(getClass().getSimpleName(), "httpStatus = " + error.getString("httpStatus"));
-                Log.e(getClass().getSimpleName(), "helpMessage = " + error.getString("helpMessage"));
-                Log.e(getClass().getSimpleName(), "type = " + error.getString("type"));
-                Log.e(getClass().getSimpleName(), "innerMessage = " + error.getString("innerMessage"));
-                throw new ProtocolException("Something went wrong");
-            }*/
+            
         } catch (MalformedURLException e) {
             e.printStackTrace();
         } catch (IOException e) {

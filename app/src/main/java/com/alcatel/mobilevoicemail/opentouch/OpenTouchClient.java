@@ -36,7 +36,8 @@ import javax.net.ssl.HttpsURLConnection;
 public class OpenTouchClient {
 
     private static OpenTouchClient mInstance = null;
-    private String mBaseUrl = "https://192.168.1.55:443/api/rest"; // "https://tps-opentouch.u-strasbg.fr/api/rest"
+    //private String mBaseUrl = "https://tps-opentouch.u-strasbg.fr/api/rest";
+    private String mBaseUrl = "https://192.168.1.47:4430/api/rest";// "https://tps-opentouch.u-strasbg.fr/api/rest";
     private String mLoginName = null;
     private CookieManager mCookieStore;
     private Mailbox mDefaultMailbox;
@@ -204,7 +205,8 @@ public class OpenTouchClient {
 
                 // Connection successful
                 App.getContext().sendBroadcast(new Intent("LOGIN_SUCCESS"));
-                subscribe("/1.0/subscriptions");
+                Subscribe sub = new Subscribe();
+                sub.subscribe();
                 return null;
             } catch (Exception e) {
                 // Connection error
@@ -293,69 +295,5 @@ public class OpenTouchClient {
     }
 
 
-    void subscribe(String relativeUrl) {
-        try {
-            // i.e.: request = "http://example.com/index.php?param1=a&param2=b&param3=c";
-            Log.d(getClass().getSimpleName(), "==== POST :" + mBaseUrl + relativeUrl);
-            JSONArray user_id = new JSONArray();
-            user_id.put(getLoginName());
-
-            JSONArray telephony = new JSONArray();
-            telephony.put("telephony");
-
-            JSONArray unifiedComLog = new JSONArray();
-            unifiedComLog.put("unifiedComLog");
-
-            JSONArray vide = new JSONArray();
-
-            JSONObject id1 = new JSONObject();
-            id1.put("ids", user_id);
-            id1.put("names", telephony);
-            id1.put("families", vide);
-            id1.put("origins", vide);
-
-            JSONObject id2 = new JSONObject();
-            id2.put("ids", user_id);
-            id2.put("names", unifiedComLog);
-            id2.put("families", vide);
-            id2.put("origins", vide);
-
-            JSONArray id = new JSONArray();
-            id.put(id1);
-            id.put(id2);
-
-            JSONObject selectors = new JSONObject();
-            selectors.put("selectors", id);
-
-            JSONObject filter = new JSONObject();
-            filter.put("filter", selectors);
-            filter.put("mode", "CHUNK");
-            filter.put("format", "JSON");
-            filter.put("version", "1.0");
-            filter.put("timeout", 10);
-            JSONObject response = requestJson("POST", relativeUrl, filter.toString());
-            Log.d(getClass().getSimpleName(), "*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-* : " + response);
-            String subscriptionId = response.getString("subscriptionId");
-            String publicPollingUrl = response.getString("publicPollingUrl");
-            String privatePollingUrl = response.getString("privatePollingUrl");
-            /*URL url = new URL(publicPollingUrl);
-            HttpsURLConnection urlConnection = (HttpsURLConnection) url.openConnection();
-            urlConnection.setRequestMethod("GET");
-            urlConnection.setDoInput(true);
-            urlConnection.connect();
-            urlConnection.getContent();
-            urlConnection.disconnect();*/
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (JSONException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (HttpException e) {
-            e.printStackTrace();
-        } catch (ProtocolException e) {
-            e.printStackTrace();
-        }
-    }
+    
 }
