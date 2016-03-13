@@ -36,8 +36,8 @@ import javax.net.ssl.HttpsURLConnection;
 public class OpenTouchClient {
 
     private static OpenTouchClient mInstance = null;
-    //private String mBaseUrl = "https://tps-opentouch.u-strasbg.fr/api/rest";
-    private String mBaseUrl = "https://192.168.1.47:4430/api/rest";// "https://tps-opentouch.u-strasbg.fr/api/rest";
+    private String mBaseUrl = "https://tps-opentouch.u-strasbg.fr/api/rest";
+    //private String mBaseUrl = "https://192.168.1.47:4430/api/rest";
     private String mLoginName = null;
     private CookieManager mCookieStore;
     private Mailbox mDefaultMailbox;
@@ -205,8 +205,13 @@ public class OpenTouchClient {
 
                 // Connection successful
                 App.getContext().sendBroadcast(new Intent("LOGIN_SUCCESS"));
-                Subscribe sub = new Subscribe();
-                sub.subscribe();
+
+                new Thread(new Runnable() {
+                    public void run() {
+                        Subscribe subscriber = new Subscribe();
+                        subscriber.subscribe();
+                    }
+                }, "Subscriber Thread").start();
                 return null;
             } catch (Exception e) {
                 // Connection error
