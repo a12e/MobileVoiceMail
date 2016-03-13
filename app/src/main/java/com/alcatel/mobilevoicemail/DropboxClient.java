@@ -58,7 +58,7 @@ public class DropboxClient {
         @Override
         protected Void doInBackground(LocalVoicemail... params) {
             if(params.length != 1) {
-                throw new IllegalArgumentException("Only one paramter please");
+                throw new IllegalArgumentException("Only one parameter please");
             }
             LocalVoicemail voicemail = params[0];
 

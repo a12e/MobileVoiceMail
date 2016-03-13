@@ -6,6 +6,8 @@ import android.util.Base64;
 import android.util.Log;
 
 import com.alcatel.mobilevoicemail.App;
+import com.alcatel.mobilevoicemail.SearchContactResultsActivity;
+import com.alcatel.mobilevoicemail.ThreadsActivity;
 import com.alcatel.mobilevoicemail.opentouch.exceptions.AuthenticationException;
 import com.alcatel.mobilevoicemail.opentouch.exceptions.ProtocolException;
 
@@ -28,6 +30,7 @@ import java.net.CookieManager;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -231,14 +234,12 @@ public class OpenTouchClient {
                 disconnect1.setRequestProperty("Accept", "application/json, application/xml, text/json, text/x-json, text/javascript, text/xml");
                 disconnect1.setRequestProperty("Content-Type", "application/json");
                 disconnect1.connect();
-                printHTTPHeaders(getClass().getSimpleName(), disconnect1);
                 mCookieStore.getCookieStore().removeAll();
 
                 // We expect a 204
                 if (disconnect1.getResponseCode() != 204) {
                     throw new ProtocolException("Expected a 204 response code");
                 }
-                // Connection successful cf http://developer.android.com/reference/java/net/CookieStore.html y a removeALL
                 App.getContext().sendBroadcast(new Intent("LOGOUT_SUCCESS"));
                 return null;
             } catch (Exception e) {
@@ -251,26 +252,25 @@ public class OpenTouchClient {
         }
     }
 
+    //tache qui s'occupe de recuperer le contact recherché dans la liste de contacts de l'opentouch
     class getContactsOpenTouchTask extends AsyncTask<String, Void, Void> {
         protected Void doInBackground(String... params) {
+            if(params.length != 1) {
+                throw new IllegalArgumentException("Only one parameter");
+            }
             try {
-                // Disconnect
-                //requestJson("POST", "/1.0/directory/search", "{\"directory\":null,\"limit\":0,\"filter\":{\"field\":\"lastName\",\"operand\":\"\",\"operation\":\"CONTAIN\"}}");
-                requestJson("POST", "/1.0/directory/search", "{\"directory\":null,\"limit\":0,\"filter\":{\"field\":\"lastName\",\"operand\":\"t\",\"operation\":\"CONTAIN\"}}");
+                requestJson("POST", "/1.0/directory/search", "{\"directory\":null,\"limit\":0,\"filter\":{\"field\":\"lastName\",\"operand\":\"" + params[0] + "\",\"operation\":\"CONTAIN\"}}");
 
-                HttpsURLConnection connection1 = createHTTPSConnection("GET", "/1.0/directory/search");
-                connection1.setDoInput(true);
-                connection1.connect();
-                connection1.getContent();
-                connection1.disconnect();
-                //App.getContext().sendBroadcast(new Intent("GETCONTACT_SUCCESS"));
+                JSONObject contacts = getJson("/1.0/directory/search");
+
+                int sizeListContacts = contacts.getJSONArray("resultElements").length();
+                int i = 0;
+                for(i = 0;i<sizeListContacts;i++){
+                    String firstname = contacts.getJSONArray("resultElements").getJSONObject(i).getJSONArray("contacts").getJSONObject(0).getString("firstName");
+                    String lastname = contacts.getJSONArray("resultElements").getJSONObject(i).getJSONArray("contacts").getJSONObject(0).getString("lastName");
+                    SearchContactResultsActivity.getResultsSearch().add(firstname + " " + lastname); // Ajoute le nom/prenom à la liste affichant le resultat
+                }
                 return null;
-
-                // We expect a 204
-                /*if(disconnect1.getResponseCode() != 204) {
-                    throw new ProtocolException("Expected a 204 response code");
-                }*/
-                // Connection successful cf http://developer.android.com/reference/java/net/CookieStore.html y a removeALL
             } catch (Exception e) {
                 // Connection error
                 Log.e(getClass().getSimpleName(), "Get contacts error");
@@ -292,12 +292,10 @@ public class OpenTouchClient {
         new LogOutTask().execute();
     }
 
-    public void getContactsOpenTouch() {
-        Log.i(getClass().getSimpleName(), "Starting getting all contacts from Opentouch");
-        new getContactsOpenTouchTask().execute();
+    // Execute la requete afin de recuperer la liste des contacts contentant ce nom de famille
+    public void getContactOpenTouch(String name) {
+        Log.i(getClass().getSimpleName(), "Starting getting contacts from Opentouch");
+        new getContactsOpenTouchTask().execute(name);
 
     }
-
-
-    
 }
