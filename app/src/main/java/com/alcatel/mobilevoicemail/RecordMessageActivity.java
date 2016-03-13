@@ -121,7 +121,7 @@ public class RecordMessageActivity extends ActionBarActivity {
         // For linking the app to the account
         //DropboxClient.getInstance().startOAuth2Authentication(RecordMessageActivity.this);
 
-        Log.i(getClass().getSimpleName(), "Sending message to Dropbox");
+        Log.d(getClass().getSimpleName(), "Will send message to Dropbox");
         DropboxClient.getInstance().putFile(mRecordedMessagePath);
     }
 

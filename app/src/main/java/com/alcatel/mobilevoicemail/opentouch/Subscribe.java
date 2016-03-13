@@ -72,7 +72,7 @@ public class Subscribe {
 
             String publicPollingUrl2 = publicPollingUrl.replace("\\", "");
             Log.d(getClass().getSimpleName(), "======= GET : " + publicPollingUrl2);
-            URL url = new URL(publicPollingUrl2.replace("tps-opentouch.u-strasbg.fr","192.168.1.47"));
+            URL url = new URL(publicPollingUrl2/*.replace("tps-opentouch.u-strasbg.fr","192.168.1.47")*/);
             HttpsURLConnection urlConnection = (HttpsURLConnection) url.openConnection();
             urlConnection.setRequestMethod("GET");
             urlConnection.setRequestProperty("Content-Type", "application/json");
