@@ -25,13 +25,32 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+
+        </activity>
+        <activity
+            android:name=".SearchContactResultsActivity"
+            android:label="@string/title_activity_search_results">
+
+            <intent-filter>
+                <action android:name="android.intent.action.SEARCH" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.app.searchable"
+                android:resource="@xml/searchable" />
+
         </activity>
         <activity
             android:name=".RecordMessageActivity"
             android:label="@string/title_activity_record_message"/>
         <activity
             android:name=".ThreadsActivity"
-            android:label="@string/title_activity_threads"/>
+            android:label="@string/title_activity_threads">
+            <meta-data
+                android:name="android.app.default_searchable"
+                android:value=".SearchContactResultsActivity" />
+
+            </activity>
 
         <activity
             android:name="com.dropbox.client2.android.AuthActivity"
