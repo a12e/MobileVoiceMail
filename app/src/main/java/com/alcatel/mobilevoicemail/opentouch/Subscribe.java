@@ -12,6 +12,7 @@ import org.json.JSONObject;
 import java.io.BufferedInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -64,7 +65,7 @@ public class Subscribe {
             filter.put("version", "1.0");
             filter.put("timeout", 10);
             JSONObject response = OpenTouchClient.getInstance().requestJson("POST", relativeUrl, filter.toString());
-            Log.d(getClass().getSimpleName(), "*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-* : " + response);
+            Log.d(getClass().getSimpleName(), "======= Response : " + response);
             String subscriptionId = response.getString("subscriptionId");
             String publicPollingUrl = response.getString("publicPollingUrl");
             String privatePollingUrl = response.getString("privatePollingUrl");
@@ -79,9 +80,7 @@ public class Subscribe {
             urlConnection.setRequestProperty("Accept", "application/json");
             urlConnection.setDoInput(true);
 
-            Log.d(getClass().getSimpleName(), "test");
             urlConnection.connect();
-            Log.d(getClass().getSimpleName(), "test2");
             String responsePolling = "{}";
 
             if(urlConnection.getResponseCode() != HttpURLConnection.HTTP_NO_CONTENT
@@ -94,8 +93,15 @@ public class Subscribe {
                     Log.e(getClass().getSimpleName(), "HTTP response code is " + urlConnection.getResponseCode());
                 }
             }
-            Log.d(getClass().getSimpleName(), "*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-* : " + responsePolling);
-            
+            Log.d(getClass().getSimpleName(), "======= Polling Response : " + responsePolling);
+
+            final byte[] buffer = new byte[65536];
+            BufferedInputStream is = new BufferedInputStream(urlConnection.getInputStream());
+            int r;
+            while ((r = is.read(buffer)) > 0) {
+                Log.d(getClass().getSimpleName(), "======= Subscribe response : " + r );
+            }
+
         } catch (MalformedURLException e) {
             e.printStackTrace();
         } catch (IOException e) {
