@@ -2,6 +2,7 @@ package com.alcatel.mobilevoicemail;
 
 
 import android.app.AlertDialog;
+import android.app.SearchManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -11,6 +12,8 @@ import android.support.v7.app.ActionBarActivity;
 
 import android.os.Bundle;
 import android.view.KeyEvent;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.inputmethod.EditorInfo;
@@ -18,6 +21,7 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.SearchView;
 import android.widget.TextView;
 
 import com.alcatel.mobilevoicemail.opentouch.OpenTouchClient;
@@ -165,6 +169,9 @@ public class LoginActivity extends ActionBarActivity {
         this.registerReceiver(mLoginSuccessReceiver, new IntentFilter("LOGIN_SUCCESS"));
         this.registerReceiver(mLoginErrorReceiver, new IntentFilter("LOGIN_ERROR"));
     }
+
+
+
 
     private void attemptLogin() {
         OpenTouchClient.getInstance().login(
