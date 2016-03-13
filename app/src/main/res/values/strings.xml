@@ -23,6 +23,7 @@
     <string name="hint">hinting</string>
     <string name="title_activity_search_results">title activi</string>
     <string name="action_settings">Settings</string>
+    <string name="save">Enregistrer</string>
 
 
 </resources>

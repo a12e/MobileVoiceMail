@@ -15,10 +15,10 @@
         android:layout_height="wrap_content"
         android:text="Record new message"
         android:id="@+id/record_button"
-        android:layout_above="@+id/deconnexion"
+        android:layout_above="@+id/logout_button"
         android:layout_alignParentEnd="true" />
 
-    <Button android:id="@+id/deconnexion" style="?android:textAppearanceSmall"
+    <Button android:id="@+id/logout_button" style="?android:textAppearanceSmall"
         android:layout_width="match_parent" android:layout_height="wrap_content"
         android:text="@string/deconnexion"
         android:textStyle="bold"
@@ -29,4 +29,10 @@
         android:layout_width="match_parent" android:layout_height="wrap_content"
         android:text="@string/SearchContact"
         android:textStyle="bold" />
+
+    <ListView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/threads_list_view"
+        android:layout_below="@+id/SearchContact" />
 </RelativeLayout>

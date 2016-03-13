@@ -7,7 +7,6 @@ import org.json.JSONObject;
 
 public class Voicemail extends BaseVoicemail {
 
-    private Identifier mFrom;
     private int mDuration;
     private String mDate;
     private Boolean mUnread;
@@ -31,10 +30,6 @@ public class Voicemail extends BaseVoicemail {
         JSONObject object = new JSONObject();
 
         return object;
-    }
-
-    public Identifier getFrom() {
-        return mFrom;
     }
 
     public int getDuration() {

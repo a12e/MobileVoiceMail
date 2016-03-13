@@ -26,7 +26,7 @@ public class Mailbox {
             @Override
             public void onReceive(Context context, Intent intent) {
                 ArrayList<Identifier> destinations = new ArrayList<>();
-                destinations.add(new Identifier(OpenTouchClient.getInstance().getLoginName()));
+                destinations.add(new Identifier(intent.getStringExtra("destination")));
                 sendMessage(destinations, false, intent.getStringExtra("url"));
             }
         };

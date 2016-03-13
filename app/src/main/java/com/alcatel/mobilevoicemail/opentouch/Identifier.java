@@ -13,6 +13,11 @@ public class Identifier {
         this.mLoginName = loginName;
     }
 
+    // Retourne un Identifier de la personne connectée
+    public static Identifier me() {
+        return new Identifier(OpenTouchClient.getInstance().getLoginName());
+    }
+
     public static Identifier fromJson(JSONObject object) throws JSONException {
         Identifier identifier = new Identifier(object.getString("loginName"));
         identifier.mPhoneNumber = object.getString("phoneNumber");
@@ -28,5 +33,29 @@ public class Identifier {
         object.put("instantMessagingId", mInstantMessagingId);
         object.put("companyEmail", mCompanyEmail);
         return object;
+    }
+
+    public String getLoginName() {
+        return mLoginName;
+    }
+
+    public String getPhoneNumber() {
+        return mPhoneNumber;
+    }
+
+    public String getInstantMessagingId() {
+        return mInstantMessagingId;
+    }
+
+    public String getCompanyEmail() {
+        return mCompanyEmail;
+    }
+
+    public String getDisplayName() {
+        String displayName = mLoginName;
+        if(!mPhoneNumber.equals("")) {
+            displayName = displayName.concat(" (" + mPhoneNumber + ")");
+        }
+        return displayName;
     }
 }

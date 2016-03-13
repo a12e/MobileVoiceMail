@@ -5,8 +5,6 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.util.Log;
 
-import com.alcatel.mobilevoicemail.opentouch.Identifier;
-import com.alcatel.mobilevoicemail.opentouch.OpenTouchClient;
 import com.dropbox.client2.DropboxAPI;
 import com.dropbox.client2.android.AndroidAuthSession;
 import com.dropbox.client2.exception.DropboxException;
@@ -16,7 +14,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URL;
-import java.util.ArrayList;
 
 import javax.net.ssl.HttpsURLConnection;
 
@@ -57,12 +54,13 @@ public class DropboxClient {
         mDBApi.getSession().startOAuth2Authentication(context);
     }
 
-    private class UploadFileTask extends AsyncTask<String, Void, Void> {
+    private class UploadFileTask extends AsyncTask<LocalVoicemail, Void, Void> {
         @Override
-        protected Void doInBackground(String... params) {
+        protected Void doInBackground(LocalVoicemail... params) {
             if(params.length != 1) {
                 throw new IllegalArgumentException("Only one paramter please");
             }
+            LocalVoicemail voicemail = params[0];
 
             Log.d(getClass().getSimpleName(), "Sending message to Dropbox");
 
@@ -73,11 +71,11 @@ public class DropboxClient {
                 e.printStackTrace();
             }
 
-            Log.i(getClass().getSimpleName(), "Local file name is " + params[0]);
+            Log.i(getClass().getSimpleName(), "Local file name is " + voicemail.getPath());
 
             FileInputStream inputStream = null;
             try {
-                File file = new File(params[0]);
+                File file = new File(voicemail.getPath());
                 inputStream = new FileInputStream(file);
                 DropboxAPI.Entry newEntry = mDBApi.putFile(file.getName(), inputStream,
                         file.length(), null, null);
@@ -96,10 +94,15 @@ public class DropboxClient {
                 String realURL = connection.getHeaderField("Location").replace("?dl=0", "?dl=1");
                 realURL = decode(realURL, "UTF-8");
                 Log.i(getClass().getSimpleName(), "Dropbox real URL is " + realURL);
+                voicemail.setUrl(realURL);
+
+                // Add the message to the SentMailbox
+                SentMailbox.getInstance().addVoicemail(voicemail);
 
                 // Notify the app that the message has been successfully sent to Dropbox
                 Intent messageUploadedIntent = new Intent("MESSAGE_UPLOADED");
-                messageUploadedIntent.putExtra("url", realURL);
+                messageUploadedIntent.putExtra("destination", voicemail.getDestination().getLoginName());
+                messageUploadedIntent.putExtra("url", voicemail.getUrl());
                 App.getContext().sendBroadcast(messageUploadedIntent);
             } catch (Exception e) {
                 Log.e(getClass().getSimpleName(), "Something went wrong: " + e);
@@ -115,7 +118,7 @@ public class DropboxClient {
         }
     }
 
-    public void putFile(String localFilePath) {
-        new UploadFileTask().execute(localFilePath);
+    public void uploadVoicemail(LocalVoicemail voicemail) {
+        new UploadFileTask().execute(voicemail);
     }
 }
