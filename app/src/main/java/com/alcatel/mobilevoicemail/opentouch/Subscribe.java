@@ -79,7 +79,7 @@ public class Subscribe {
 
             // On envoie un get à la polling url pour lui dire uq'on est prêt à recevoir les notifications
             Log.d(getClass().getSimpleName(), "======= GET : " + publicPollingUrl2);
-            URL url = new URL(publicPollingUrl2.replace("tps-opentouch.u-strasbg.fr","192.168.1.47"));
+            URL url = new URL(publicPollingUrl2/*.replace("tps-opentouch.u-strasbg.fr","192.168.1.47")*/);
             HttpsURLConnection urlConnection = (HttpsURLConnection) url.openConnection();
             urlConnection.setRequestMethod("GET");
             urlConnection.setRequestProperty("Content-Type", "application/json");

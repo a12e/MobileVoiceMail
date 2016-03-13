@@ -31,8 +31,15 @@ public class DropboxClient {
     private DropboxAPI<AndroidAuthSession> mDBApi = null;
 
     private DropboxClient() {
-        AppKeyPair keyPair = new AppKeyPair(APP_KEY, APP_SECRET);
-        mDBApi = new DropboxAPI<>(new AndroidAuthSession(keyPair, APP_OATOKEN));
+        Log.d(getClass().getSimpleName(), "Creating DropboxClient");
+        try {
+            AppKeyPair keyPair = new AppKeyPair(APP_KEY, APP_SECRET);
+            mDBApi = new DropboxAPI<>(new AndroidAuthSession(keyPair, APP_OATOKEN));
+        }
+        catch(Exception e) {
+            e.printStackTrace();
+        }
+        Log.d(getClass().getSimpleName(), "Created DropboxClient");
     }
 
     public static DropboxClient getInstance() {
@@ -56,6 +63,8 @@ public class DropboxClient {
             if(params.length != 1) {
                 throw new IllegalArgumentException("Only one paramter please");
             }
+
+            Log.d(getClass().getSimpleName(), "Sending message to Dropbox");
 
             try {
                 Log.i(getClass().getSimpleName(), "Using dropbox of the user " +

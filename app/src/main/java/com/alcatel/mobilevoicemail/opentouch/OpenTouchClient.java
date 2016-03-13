@@ -205,8 +205,13 @@ public class OpenTouchClient {
 
                 // Connection successful
                 App.getContext().sendBroadcast(new Intent("LOGIN_SUCCESS"));
-                Subscribe sub = new Subscribe();
-                sub.subscribe();
+
+                new Thread(new Runnable() {
+                    public void run() {
+                        Subscribe subscriber = new Subscribe();
+                        subscriber.subscribe();
+                    }
+                }, "Subscriber Thread").start();
                 return null;
             } catch (Exception e) {
                 // Connection error
