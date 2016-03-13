@@ -24,9 +24,4 @@
         android:textStyle="bold"
         android:layout_alignParentBottom="true"
         android:layout_alignParentStart="true" />
-
-    <Button android:id="@+id/SearchContact" style="?android:textAppearanceSmall"
-        android:layout_width="match_parent" android:layout_height="wrap_content"
-        android:text="@string/SearchContact"
-        android:textStyle="bold" />
 </RelativeLayout>

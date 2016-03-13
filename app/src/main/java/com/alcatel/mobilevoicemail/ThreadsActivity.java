@@ -44,15 +44,6 @@ public class ThreadsActivity extends ActionBarActivity {
                 startActivity(LoginIntent);
             }
         });
-
-        //Recherche de la liste de contact
-        Button mContacts = (Button) findViewById(R.id.SearchContact);
-        mContacts.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                OpenTouchClient.getInstance().getContactsOpenTouch();
-            }
-        });
     }
 
 
@@ -69,12 +60,8 @@ public class ThreadsActivity extends ActionBarActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
         if (id == R.id.search) {
             onSearchRequested();
             return true;

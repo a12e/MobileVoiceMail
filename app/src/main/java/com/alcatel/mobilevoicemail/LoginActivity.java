@@ -112,11 +112,6 @@ public class LoginActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-
-        System.out.println("->mdp" + this.getOnPreference(PREFS_PASS));
-        System.out.println("->rememberme" + this.getOnPreference(PREFS_REMEMBERME));
-        System.out.println("->puburl " + this.getOnPreference(PREFS_PUBURL));
-        System.out.println("->privurl " + this.getOnPreference(PREFS_PRIVURL));
         CheckBox temp = ((CheckBox)findViewById(R.id.checkbox_rememberme));
 
         // Set up the login form.
@@ -133,10 +128,10 @@ public class LoginActivity extends ActionBarActivity {
         }
 
         if (Objects.equals(this.getOnPreference(PREFS_REMEMBERME),"true")){
-            temp.setChecked(true); System.out.println("true pref");
+            temp.setChecked(true);
         }
         else{
-            temp.setChecked(false); this.cleanPreferences(); System.out.println("ici passe");
+            temp.setChecked(false); this.cleanPreferences();
         }
 
         mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {

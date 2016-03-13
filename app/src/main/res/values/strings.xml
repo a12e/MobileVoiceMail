@@ -19,9 +19,8 @@
     <string name="title_activity_threads">ThreadsActivity</string>
     <string name="rememberme">Remember me</string>
     <string name="deconnexion">Disconnect</string>
-    <string name="SearchContact">SearchContact</string>
-    <string name="hint">hinting</string>
-    <string name="title_activity_search_results">title activi</string>
+    <string name="hint">Search a contact</string>
+    <string name="title_activity_search_results">title activity</string>
     <string name="action_settings">Settings</string>
 
 

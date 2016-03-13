@@ -61,7 +61,7 @@ public class DropboxClient {
         @Override
         protected Void doInBackground(String... params) {
             if(params.length != 1) {
-                throw new IllegalArgumentException("Only one paramter please");
+                throw new IllegalArgumentException("Only one parameter please");
             }
 
             Log.d(getClass().getSimpleName(), "Sending message to Dropbox");
