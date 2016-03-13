@@ -12,6 +12,7 @@ import org.json.JSONObject;
 import java.io.BufferedInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -27,6 +28,8 @@ public class Subscribe {
         try {
             String relativeUrl = "/1.0/subscriptions";
             Log.d(getClass().getSimpleName(), "==== POST :" + relativeUrl);
+
+            // Création du JSon object
             JSONArray user_id = new JSONArray();
             user_id.put(OpenTouchClient.getInstance().getLoginName());
 
@@ -63,14 +66,18 @@ public class Subscribe {
             filter.put("format", "JSON");
             filter.put("version", "1.0");
             filter.put("timeout", 10);
+
+            // Envoie du JsonObject
             JSONObject response = OpenTouchClient.getInstance().requestJson("POST", relativeUrl, filter.toString());
-            Log.d(getClass().getSimpleName(), "*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-* : " + response);
+            Log.d(getClass().getSimpleName(), "======= Response : " + response);
             String subscriptionId = response.getString("subscriptionId");
             String publicPollingUrl = response.getString("publicPollingUrl");
             String privatePollingUrl = response.getString("privatePollingUrl");
 
-
+            // On enlève les \ de l'url reçu
             String publicPollingUrl2 = publicPollingUrl.replace("\\", "");
+
+            // On envoie un get à la polling url pour lui dire uq'on est prêt à recevoir les notifications
             Log.d(getClass().getSimpleName(), "======= GET : " + publicPollingUrl2);
             URL url = new URL(publicPollingUrl2/*.replace("tps-opentouch.u-strasbg.fr","192.168.1.47")*/);
             HttpsURLConnection urlConnection = (HttpsURLConnection) url.openConnection();
@@ -79,23 +86,16 @@ public class Subscribe {
             urlConnection.setRequestProperty("Accept", "application/json");
             urlConnection.setDoInput(true);
 
-            Log.d(getClass().getSimpleName(), "test");
             urlConnection.connect();
-            Log.d(getClass().getSimpleName(), "test2");
-            String responsePolling = "{}";
 
-            if(urlConnection.getResponseCode() != HttpURLConnection.HTTP_NO_CONTENT
-                    && urlConnection.getResponseCode() != HttpURLConnection.HTTP_CREATED) {
-                try {
-                    BufferedInputStream is = new BufferedInputStream(urlConnection.getInputStream());
-                    responsePolling = OpenTouchClient.readFromStream(is);
-                } catch (FileNotFoundException fnfe) {
-                    Log.e(getClass().getSimpleName(), "The server returned an empty response :(");
-                    Log.e(getClass().getSimpleName(), "HTTP response code is " + urlConnection.getResponseCode());
-                }
+            // Boucle de récéption des notifications
+            final byte[] buffer = new byte[65536];
+            BufferedInputStream is = new BufferedInputStream(urlConnection.getInputStream());
+            int r;
+            while ((r = is.read(buffer)) > 0) {
+                Log.d(getClass().getSimpleName(), "======= Subscribe response : " + r );
             }
-            Log.d(getClass().getSimpleName(), "*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-* : " + responsePolling);
-            
+
         } catch (MalformedURLException e) {
             e.printStackTrace();
         } catch (IOException e) {

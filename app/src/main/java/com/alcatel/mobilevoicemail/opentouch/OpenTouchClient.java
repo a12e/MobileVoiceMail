@@ -298,7 +298,4 @@ public class OpenTouchClient {
         new getContactsOpenTouchTask().execute(name);
 
     }
-
-
-    
 }
