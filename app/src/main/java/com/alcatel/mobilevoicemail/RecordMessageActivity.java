@@ -1,6 +1,10 @@
 package com.alcatel.mobilevoicemail;
 
 import android.app.AlertDialog;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.MediaRecorder;
@@ -9,6 +13,7 @@ import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
 
 import com.alcatel.mobilevoicemail.opentouch.Identifier;
 import com.intervigil.wave.WaveWriter;
@@ -31,6 +36,9 @@ public class RecordMessageActivity extends ActionBarActivity {
     Thread mWriterThread;
     private LocalVoicemail mRecordedVoicemail;
 
+    private BroadcastReceiver mMessageSentReceiver;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -47,10 +55,26 @@ public class RecordMessageActivity extends ActionBarActivity {
                 }
             }
         });
+
+        // Lorsque le message a été correctement envoyé à l'OpenTouch on affiche une petite
+        // bulle et on ferme cette activité
+        registerReceiver(mMessageSentReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                Toast.makeText(App.getContext(), R.string.message_sent, Toast.LENGTH_SHORT).show();
+                RecordMessageActivity.this.finish();
+            }
+        }, new IntentFilter("MESSAGE_SENT"));
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        unregisterReceiver(mMessageSentReceiver);
     }
 
     protected void startRecording() {
-        mRecordButton.setText("Terminer");
+        mRecordButton.setText(R.string.finish);
 
         mBufferSize = AudioRecord.getMinBufferSize(RECORDER_SAMPLERATE, RECORDER_CHANNELS,
                 RECORDER_AUDIO_ENCODING);

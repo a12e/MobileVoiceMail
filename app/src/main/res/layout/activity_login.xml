@@ -45,7 +45,7 @@
             <CheckBox android:id="@+id/checkbox_rememberme"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/rememberme"
+                android:text="@string/remember_me"
                 android:onClick="onCheckboxRememberMeClicked"/>
 
         </LinearLayout>

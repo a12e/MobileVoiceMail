@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.AsyncTask;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.alcatel.mobilevoicemail.App;
 
@@ -59,9 +60,7 @@ public class Mailbox {
                 }
 
                 Log.i(getClass().getSimpleName(), "Messages received " + voicemails.toString());
-
                 App.getContext().sendBroadcast(new Intent("MAILBOX_SYNC"));
-
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -91,12 +90,16 @@ public class Mailbox {
                 JSONObject request = new JSONObject();
                 request.put("destinations", destinations);
                 request.put("highPriority", parameters.highPriority);
-                request.put("url", parameters.url);
+//                request.put("url", parameters.url);
+                // TODO THIS IS A TEMPORARY FIX !!
+                request.put("url", "http://130.79.92.110/edison.wav");
 
                 Log.i(getClass().getSimpleName(), "sendMessage request: " + request.toString());
                 JSONObject response = OpenTouchClient.getInstance().requestJson("POST",
                         "/1.0/messaging/mailboxes/" + mId + "/recorder/send", request.toString().replace("\\", ""));
-                Log.i(getClass().getSimpleName(), "sendMessage response: " + response.toString());
+
+                Log.i(getClass().getSimpleName(), "sendMessage OK " + response.toString());
+                App.getContext().sendBroadcast(new Intent("MESSAGE_SENT"));
             } catch (Exception e) {
                 e.printStackTrace();
             }

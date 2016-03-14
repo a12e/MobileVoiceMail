@@ -13,16 +13,19 @@
     <string name="permission_rationale">"Contacts permissions are needed for providing email
         completions."
     </string>
-    <string name="url_public">Adresse url publique de l\'opentouch</string>
-    <string name="url_private">Adresse url privée de l\'opentouch</string>
-    <string name="title_activity_record_message">RecordMessageActivity</string>
-    <string name="title_activity_threads">ThreadsActivity</string>
-    <string name="rememberme">Remember me</string>
-    <string name="deconnexion">Disconnect</string>
+    <string name="url_public">URL publique de l\'Opentouch</string>
+    <string name="url_private">URL privée de l\'Opentouch</string>
+    <string name="title_activity_record_message">Enregistrement</string>
+    <string name="title_activity_threads">Boîte vocale</string>
+    <string name="remember_me">Remember me</string>
+    <string name="logout">Déconnexion</string>
     <string name="hint">Search a contact</string>
     <string name="title_activity_search_results">title activity</string>
     <string name="action_settings">Settings</string>
     <string name="save">Enregistrer</string>
+    <string name="finish">Terminer</string>
+    <string name="message_sent">Message envoyé</string>
+    <string name="search">Rechercher</string>
 
 
 </resources>

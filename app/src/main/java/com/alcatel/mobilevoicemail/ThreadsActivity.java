@@ -33,9 +33,10 @@ public class ThreadsActivity extends ActionBarActivity {
 
     private class ThreadsAdapter extends ArrayAdapter<String> {
         public ThreadsAdapter(List<String> objects) {
-            super(getApplicationContext(), 0, objects);
+            super(ThreadsActivity.this, 0, objects);
         }
 
+        // Ce sac contient les vues associées à un item
         class ThreadViewBag {
             public ImageView photo;
             public TextView identifier;
@@ -46,8 +47,8 @@ public class ThreadsActivity extends ActionBarActivity {
             // Android nous fournit un convertView null lorsqu'il nous demande de la créer
             // dans le cas contraire, cela veux dire qu'il nous fournit une vue recyclée
             if(convertView == null) {
-                //Nous récupérons notre row_tweet via un LayoutInflater,
-                //qui va charger un layout xml dans un objet View
+                // Nous récupérons notre threads_list_item via un LayoutInflater,
+                // qui va charger un layout xml dans un objet View
                 convertView = LayoutInflater.from(getContext())
                         .inflate(R.layout.threads_list_item, parent, false);
             }
@@ -94,7 +95,6 @@ public class ThreadsActivity extends ActionBarActivity {
                 startActivity(loginIntent);
             }
         });
-    
 
         // List of all threads
         mThreadsListView = (ListView)findViewById(R.id.threads_list_view);
@@ -149,7 +149,6 @@ public class ThreadsActivity extends ActionBarActivity {
         startSearch(null, false, null, false);
         return true;
     }
-    //FIN Gestion de la recherche contact
 
     private void updateThreadsListView() {
         ArrayList<LocalVoicemail> sentVoicemails = SentMailbox.getInstance().getVoicemails();
@@ -157,8 +156,7 @@ public class ThreadsActivity extends ActionBarActivity {
 
         ArrayList<String> peopleNames = new ArrayList<>();
         for(LocalVoicemail voicemail: sentVoicemails) {
-            Log.d(getClass().getSimpleName(), voicemail.getDestination().toString());
-            //peopleNames.add(voicemail.getDestination().getDisplayName());
+            peopleNames.add(voicemail.getDestination().getDisplayName());
         }
 
         mThreadsListView.setAdapter(new ThreadsAdapter(peopleNames));

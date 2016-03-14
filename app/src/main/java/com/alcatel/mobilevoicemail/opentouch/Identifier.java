@@ -10,7 +10,10 @@ public class Identifier {
     private String mCompanyEmail;
 
     public Identifier(String loginName) {
-        this.mLoginName = loginName;
+        mLoginName = loginName;
+        mPhoneNumber = "";
+        mInstantMessagingId = "";
+        mCompanyEmail = "";
     }
 
     // Retourne un Identifier de la personne connectée
@@ -53,7 +56,7 @@ public class Identifier {
 
     public String getDisplayName() {
         String displayName = mLoginName;
-        if(!mPhoneNumber.equals("")) {
+        if(mPhoneNumber != null && !mPhoneNumber.equals("")) {
             displayName = displayName.concat(" (" + mPhoneNumber + ")");
         }
         return displayName;
