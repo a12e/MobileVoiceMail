@@ -14,6 +14,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class Mailbox {
 
@@ -22,6 +23,7 @@ public class Mailbox {
 
     public Mailbox(int mailboxId) {
         this.mId = mailboxId;
+        this.mVoicemails = new ArrayList<>();
 
         BroadcastReceiver mMessageUploadedReceiver = new BroadcastReceiver() {
             @Override
@@ -35,7 +37,7 @@ public class Mailbox {
     }
 
     public ArrayList<Voicemail> getVoicemails() {
-        return null;
+        return mVoicemails;
     }
 
     private class FetchMessagesTask extends AsyncTask<Void, Void, Void> {
@@ -51,7 +53,7 @@ public class Mailbox {
                     Voicemail freshVoicemail = Voicemail.fromJson(voicemails.getJSONObject(i));
 
                     for(Voicemail storedVoicemail: mVoicemails) {
-                        if(freshVoicemail.getId() == storedVoicemail.getId()) {
+                        if(Objects.equals(freshVoicemail.getId(), storedVoicemail.getId())) {
                             mVoicemails.remove(storedVoicemail);
                         }
                     }

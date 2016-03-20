@@ -5,6 +5,7 @@ import com.alcatel.mobilevoicemail.opentouch.Identifier;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.Date;
 import java.util.UUID;
 
 public class LocalVoicemail extends BaseVoicemail {
@@ -14,6 +15,7 @@ public class LocalVoicemail extends BaseVoicemail {
     public LocalVoicemail() {
         mId = UUID.randomUUID().toString();
         mFrom = Identifier.me();
+        mDate = new Date();
     }
 
     public String getPath() {
@@ -26,6 +28,7 @@ public class LocalVoicemail extends BaseVoicemail {
         voicemail.mFrom = Identifier.fromJson(json.getJSONObject("from"));
         voicemail.mDestination = Identifier.fromJson(json.getJSONObject("destination"));
         voicemail.mUrl = json.getString("url");
+        voicemail.mDate = new Date(json.getLong("date"));
         return voicemail;
     }
 
@@ -35,6 +38,7 @@ public class LocalVoicemail extends BaseVoicemail {
         json.put("from", mFrom.toJson());
         json.put("destination", mDestination.toJson());
         json.put("url", mUrl);
+        json.put("date", mDate.getTime());
         return json;
     }
 
