@@ -16,6 +16,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.SearchView;
@@ -79,7 +80,7 @@ public class ThreadsActivity extends ActionBarActivity {
         setContentView(R.layout.activity_threads);
 
         final Intent itent = new Intent(this, RecordMessageActivity.class);
-        final Button recordButton = (Button)findViewById(R.id.record_button);
+        final ImageButton recordButton = (ImageButton)findViewById(R.id.record_button);
         recordButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
