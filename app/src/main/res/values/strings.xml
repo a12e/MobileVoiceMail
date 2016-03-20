@@ -26,6 +26,7 @@
     <string name="finish">Terminer</string>
     <string name="message_sent">Message envoyé</string>
     <string name="search">Rechercher</string>
+    <string name="contact_photo">Photo du contact</string>
 
 
 </resources>

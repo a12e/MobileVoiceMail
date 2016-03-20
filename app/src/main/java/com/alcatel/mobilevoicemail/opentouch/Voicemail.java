@@ -5,20 +5,22 @@ import com.alcatel.mobilevoicemail.BaseVoicemail;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+
 public class Voicemail extends BaseVoicemail {
 
     private int mDuration;
-    private String mDate;
     private Boolean mUnread;
     private Boolean mHighPriority;
     private String mUrl;
 
-    public static Voicemail fromJson(JSONObject object) throws JSONException {
+    public static Voicemail fromJson(JSONObject object) throws JSONException, ParseException {
         Voicemail voicemail = new Voicemail();
         voicemail.mId = object.getString("voicemailId");
         voicemail.mFrom = Identifier.fromJson(object.getJSONObject("from").getJSONObject("id"));
         voicemail.mDuration = object.getInt("duration");
-        voicemail.mDate = object.getString("date");
+        voicemail.mDate = DateFormat.getInstance().parse(object.getString("date"));
         voicemail.mUnread = object.getBoolean("unread");
         voicemail.mHighPriority = object.getBoolean("highPriority");
         voicemail.mUrl = object.getString("url");
@@ -34,10 +36,6 @@ public class Voicemail extends BaseVoicemail {
 
     public int getDuration() {
         return mDuration;
-    }
-
-    public String getDate() {
-        return mDate;
     }
 
     public Boolean getUnread() {

@@ -1,22 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-android:orientation="horizontal"
-android:layout_width="fill_parent"
-android:layout_height="fill_parent">
+    android:orientation="horizontal"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent">
 
     <ImageView
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="fill_parent"
         android:id="@+id/photo_image_view"
-        android:src="@android:drawable/stat_notify_voicemail" />
+        android:src="@android:drawable/stat_notify_voicemail"
+        android:contentDescription="@string/contact_photo" />
 
-    <TextView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:textAppearance="?android:attr/textAppearanceLarge"
-    android:id="@+id/identifer_text_view">
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="fill_parent"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:id="@+id/identifer_text_view" />
 
-</TextView>
+    <TextView
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:id="@+id/date_text_view"
+        android:gravity="end"
+        android:textAlignment="gravity" />
 
 </LinearLayout>

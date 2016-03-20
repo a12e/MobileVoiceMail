@@ -3,11 +3,16 @@ package com.alcatel.mobilevoicemail.opentouch;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.Date;
+
 public class Identifier {
     private String mLoginName;
     private String mPhoneNumber;
     private String mInstantMessagingId;
     private String mCompanyEmail;
+
+    // useful only in ThreadsActivity
+    public Date lastVoicemailDate;
 
     public Identifier(String loginName) {
         mLoginName = loginName;
