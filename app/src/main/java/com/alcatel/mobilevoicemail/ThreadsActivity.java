@@ -49,6 +49,8 @@ public class ThreadsActivity extends ActionBarActivity {
             public TextView date;
         }
 
+
+
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
             // Android nous fournit un convertView null lorsqu'il nous demande de la créer
@@ -95,16 +97,6 @@ public class ThreadsActivity extends ActionBarActivity {
             }
         });
 
-        //Gestion de la déconnexion
-        final Intent loginIntent = new Intent(this, LoginActivity.class);
-        Button mDeconnect = (Button) findViewById(R.id.logout_button);
-        mDeconnect.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                OpenTouchClient.getInstance().logout();
-                startActivity(loginIntent);
-            }
-        });
 
         // List of all threads
         mThreadsListView = (ListView)findViewById(R.id.threads_list_view);
@@ -145,8 +137,17 @@ public class ThreadsActivity extends ActionBarActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
+        //Gestion de la recherche de contacts
         if (id == R.id.search) {
             onSearchRequested();
+            return true;
+        }
+
+        //Gestion de la déconnexion
+        if(id == R.id.action_disconnect) {
+            final Intent loginIntent = new Intent(this, LoginActivity.class);
+            OpenTouchClient.getInstance().logout();
+            startActivity(loginIntent);
             return true;
         }
 
