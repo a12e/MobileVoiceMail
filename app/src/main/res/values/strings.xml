@@ -3,9 +3,9 @@
 
     <!-- Strings related to login -->
     <string name="prompt_email">Email</string>
-    <string name="prompt_password">Password</string>
-    <string name="action_sign_in">Sign in</string>
-    <string name="action_sign_in_short">Sign in</string>
+    <string name="prompt_password">Mot de passe</string>
+    <string name="action_sign_in">Connexion</string>
+    <string name="action_sign_in_short">Se connecter</string>
     <string name="error_invalid_email">This email address is invalid</string>
     <string name="error_invalid_password">This password is too short</string>
     <string name="error_incorrect_password">This password is incorrect</string>
@@ -17,11 +17,10 @@
     <string name="url_private">URL privée de l\'Opentouch</string>
     <string name="title_activity_record_message">Enregistrement</string>
     <string name="title_activity_threads">Boîte vocale</string>
-    <string name="remember_me">Remember me</string>
-    <string name="logout">Disconnect</string>
-    <string name="hint">Search a contact</string>
+    <string name="remember_me">Mémoriser</string>
+    <string name="logout">Se déconnecter</string>
+    <string name="hint">Rechercher un contact</string>
     <string name="title_activity_search_results">title activity</string>
-    <string name="action_disconnect">disconnect</string>
     <string name="save">Enregistrer</string>
     <string name="finish">Terminer</string>
     <string name="message_sent">Message envoyé</string>
