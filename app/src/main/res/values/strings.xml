@@ -18,10 +18,10 @@
     <string name="title_activity_record_message">Enregistrement</string>
     <string name="title_activity_threads">Boîte vocale</string>
     <string name="remember_me">Remember me</string>
-    <string name="logout">Déconnexion</string>
+    <string name="logout">Disconnect</string>
     <string name="hint">Search a contact</string>
     <string name="title_activity_search_results">title activity</string>
-    <string name="action_settings">Settings</string>
+    <string name="action_disconnect">disconnect</string>
     <string name="save">Enregistrer</string>
     <string name="finish">Terminer</string>
     <string name="message_sent">Message envoyé</string>
