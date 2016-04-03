@@ -3,15 +3,20 @@ package com.alcatel.mobilevoicemail.opentouch;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.Date;
+
 public class Identifier {
     private String mLoginName;
     private String mPhoneNumber;
     private String mInstantMessagingId;
     private String mCompanyEmail;
 
-    public Identifier(String loginName) {
-        mLoginName = loginName;
-        mPhoneNumber = "";
+    // useful only in ThreadsActivity
+    public Date lastVoicemailDate;
+
+    public Identifier(String phoneNumber) {
+        mLoginName = "";
+        mPhoneNumber = phoneNumber;
         mInstantMessagingId = "";
         mCompanyEmail = "";
     }
@@ -22,8 +27,8 @@ public class Identifier {
     }
 
     public static Identifier fromJson(JSONObject object) throws JSONException {
-        Identifier identifier = new Identifier(object.getString("loginName"));
-        identifier.mPhoneNumber = object.getString("phoneNumber");
+        Identifier identifier = new Identifier(object.getString("phoneNumber"));
+        identifier.mLoginName = object.getString("loginName");
         identifier.mInstantMessagingId = object.getString("instantMessagingId");
         identifier.mCompanyEmail = object.getString("companyEmail");
         return identifier;
@@ -31,10 +36,10 @@ public class Identifier {
 
     public JSONObject toJson() throws JSONException {
         JSONObject object = new JSONObject();
-        object.put("loginName", mLoginName);
-        object.put("phoneNumber", mPhoneNumber);
-        object.put("instantMessagingId", mInstantMessagingId);
-        object.put("companyEmail", mCompanyEmail);
+        object.put("loginName", mLoginName.equals("") ? null : mLoginName);
+        object.put("phoneNumber", mPhoneNumber.equals("") ? null : mPhoneNumber);
+        object.put("instantMessagingId", mInstantMessagingId.equals("") ? null : mInstantMessagingId);
+        object.put("companyEmail", mCompanyEmail.equals("") ? null : mCompanyEmail);
         return object;
     }
 

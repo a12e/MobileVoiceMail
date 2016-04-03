@@ -101,7 +101,7 @@ public class DropboxClient {
 
                 // Notify the app that the message has been successfully sent to Dropbox
                 Intent messageUploadedIntent = new Intent("MESSAGE_UPLOADED");
-                messageUploadedIntent.putExtra("destination", voicemail.getDestination().getLoginName());
+                messageUploadedIntent.putExtra("destination", voicemail.getDestination().getPhoneNumber());
                 messageUploadedIntent.putExtra("url", voicemail.getUrl());
                 App.getContext().sendBroadcast(messageUploadedIntent);
             } catch (Exception e) {

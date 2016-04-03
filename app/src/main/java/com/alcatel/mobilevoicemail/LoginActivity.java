@@ -165,9 +165,6 @@ public class LoginActivity extends ActionBarActivity {
         this.registerReceiver(mLoginErrorReceiver, new IntentFilter("LOGIN_ERROR"));
     }
 
-
-
-
     private void attemptLogin() {
         OpenTouchClient.getInstance().login(
                 mEmailView.getText().toString(),

@@ -36,7 +36,7 @@ public class OpenTouchClient {
 
     private static OpenTouchClient mInstance = null;
     private String mBaseUrl = "https://tps-opentouch.u-strasbg.fr/api/rest";
-    //private String mBaseUrl = "https://192.168.1.47:4430/api/rest";// "https://tps-opentouch.u-strasbg.fr/api/rest";
+    //private String mBaseUrl = "https://192.168.1.200:4430/api/rest";
     private String mLoginName = null;
     private CookieManager mCookieStore;
     private Mailbox mDefaultMailbox;
@@ -141,7 +141,7 @@ public class OpenTouchClient {
             Log.e(getClass().getSimpleName(), "helpMessage = " + error.getString("helpMessage"));
             Log.e(getClass().getSimpleName(), "type = " + error.getString("type"));
             Log.e(getClass().getSimpleName(), "innerMessage = " + error.getString("innerMessage"));
-            throw new ProtocolException("Something went wrong");
+            throw new ProtocolException(error.getString("innerMessage"));
         }
 
         connection.disconnect();
