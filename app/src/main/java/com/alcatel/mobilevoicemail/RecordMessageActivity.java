@@ -37,6 +37,7 @@ public class RecordMessageActivity extends ActionBarActivity {
     private LocalVoicemail mRecordedVoicemail;
 
     private BroadcastReceiver mMessageSentReceiver;
+    private BroadcastReceiver mMessageSentErrorReceiver;
 
 
     @Override
@@ -65,12 +66,23 @@ public class RecordMessageActivity extends ActionBarActivity {
                 RecordMessageActivity.this.finish();
             }
         }, new IntentFilter("MESSAGE_SENT"));
+        registerReceiver(mMessageSentErrorReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                AlertDialog.Builder ab = new AlertDialog.Builder(RecordMessageActivity.this);
+                ab.setTitle(R.string.message_sent_error_title);
+                ab.setMessage(R.string.message_sent_error + "\n" + intent.getStringExtra("message"));
+                ab.show();
+                RecordMessageActivity.this.finish();
+            }
+        }, new IntentFilter("MESSAGE_SENT_ERROR"));
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
         unregisterReceiver(mMessageSentReceiver);
+        unregisterReceiver(mMessageSentErrorReceiver);
     }
 
     protected void startRecording() {

@@ -9,6 +9,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.alcatel.mobilevoicemail.App;
+import com.alcatel.mobilevoicemail.opentouch.exceptions.ProtocolException;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -92,17 +93,22 @@ public class Mailbox {
                 JSONObject request = new JSONObject();
                 request.put("destinations", destinations);
                 request.put("highPriority", parameters.highPriority);
-//                request.put("url", parameters.url);
+                request.put("url", parameters.url);
                 // TODO THIS IS A TEMPORARY FIX !!
-                request.put("url", "http://130.79.92.110/edison.wav");
+                //request.put("url", "http://130.79.92.110/edison.wav");
 
-                Log.i(getClass().getSimpleName(), "sendMessage request: " + request.toString());
+                String jsonData = request.toString().replace("\\", "");
+
+                Log.i(getClass().getSimpleName(), "sendMessage request: " + jsonData);
                 JSONObject response = OpenTouchClient.getInstance().requestJson("POST",
-                        "/1.0/messaging/mailboxes/" + mId + "/recorder/send", request.toString().replace("\\", ""));
+                        "/1.0/messaging/mailboxes/" + mId + "/recorder/send", jsonData);
 
                 Log.i(getClass().getSimpleName(), "sendMessage OK " + response.toString());
                 App.getContext().sendBroadcast(new Intent("MESSAGE_SENT"));
             } catch (Exception e) {
+                Intent errorIntent = new Intent("ERROR");
+                errorIntent.putExtra("message", e.getMessage());
+                App.getContext().sendBroadcast(new Intent("MESSAGE_SENT_ERROR"));
                 e.printStackTrace();
             }
 
