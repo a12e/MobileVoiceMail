@@ -135,19 +135,12 @@ public class ThreadsActivity extends ActionBarActivity {
         int id = item.getItemId();
 
         if (id == R.id.search) {
-            onSearchRequested();
+            startSearch(null, false, null, false);
             return true;
         }
 
-        return super.onOptionsItemSelected(item);
-    }
 
-    @Override
-    public boolean onSearchRequested() {
-        Bundle appData = new Bundle();
-        appData.putString("hello", "world");
-        startSearch(null, false, null, false);
-        return true;
+        return super.onOptionsItemSelected(item);
     }
 
     private void updateThreadsListView() {
