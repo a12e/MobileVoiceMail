@@ -16,13 +16,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.SearchView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.alcatel.mobilevoicemail.opentouch.Identifier;
 import com.alcatel.mobilevoicemail.opentouch.OpenTouchClient;
@@ -31,7 +28,6 @@ import com.alcatel.mobilevoicemail.opentouch.Voicemail;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.List;
 
 public class ThreadsActivity extends ActionBarActivity {
@@ -49,8 +45,6 @@ public class ThreadsActivity extends ActionBarActivity {
             public TextView identifier;
             public TextView date;
         }
-
-
 
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
@@ -149,7 +143,10 @@ public class ThreadsActivity extends ActionBarActivity {
     
     private void updateThreadsListView() {
         ArrayList<LocalVoicemail> sentVoicemails = SentMailbox.getInstance().getVoicemails();
-        ArrayList<Voicemail> receivedVoicemails = OpenTouchClient.getInstance().getDefaultMailbox().getVoicemails();
+        ArrayList<Voicemail> receivedVoicemails = new ArrayList<>();
+        if(OpenTouchClient.getInstance().getDefaultMailbox() != null)
+            receivedVoicemails = OpenTouchClient.getInstance().getDefaultMailbox().getVoicemails();
+
         Log.d(getClass().getSimpleName(), "Displaying threads of " + sentVoicemails.size()
                 + " sent and " + receivedVoicemails.size() + " received messages");
 

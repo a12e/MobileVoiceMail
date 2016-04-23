@@ -248,8 +248,6 @@ public class OpenTouchClient {
         }
     }
 
-
-
     public void login(String email, String password) {
         Log.i(getClass().getSimpleName(), "Starting login");
         new LoginTask().execute(email, password);

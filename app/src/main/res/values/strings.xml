@@ -20,7 +20,6 @@
     <string name="remember_me">Mémoriser</string>
     <string name="logout">Se déconnecter</string>
     <string name="hint">Rechercher un contact</string>
-    <string name="title_activity_search_results">title activity</string>
     <string name="save">Enregistrer</string>
     <string name="finish">Terminer</string>
     <string name="message_sent">Message envoyé</string>
@@ -30,6 +29,8 @@
     <string name="message_sent_error_title">Erreur lors de l\'envoi</string>
     <string name="currently_recording">Enregistrement en cours</string>
     <string name="press_stop_to_complete">Appuyez sur le bouton pour terminer</string>
+    <string name="find_somebody">Trouver une personne</string>
+    <string name="no_message_yet">Pas encore de messages</string>
 
 
 </resources>

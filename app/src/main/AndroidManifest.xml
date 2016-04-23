@@ -28,11 +28,10 @@
         </activity>
         <activity
             android:name=".SearchContactResultsActivity"
-            android:label="@string/title_activity_search_results">
+            android:parentActivityName=".ThreadsActivity">
             <intent-filter>
                 <action android:name="android.intent.action.SEARCH" />
             </intent-filter>
-
             <meta-data
                 android:name="android.app.searchable"
                 android:resource="@xml/searchable" />
@@ -52,7 +51,6 @@
             android:configChanges="orientation|keyboard"
             android:launchMode="singleTask">
             <intent-filter>
-
                 <!-- Change this to be db- followed by your app key -->
                 <data android:scheme="db-ydma9rv0xm4wf4d" />
 

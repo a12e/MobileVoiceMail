@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.text.format.DateUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -37,7 +38,7 @@ public class ThreadActivity extends ActionBarActivity {
             throw new IllegalArgumentException("Please specify the phoneNumber extra in the Intent");
         }
         mPhoneNumber = getIntent().getStringExtra("phoneNumber");
-        setTitle("Conversation avec " + mPhoneNumber);
+        setTitle("Conversation avec le " + mPhoneNumber);
 
         // Affichage de l'icone "retour" dans l'ActionBar
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -97,6 +98,8 @@ public class ThreadActivity extends ActionBarActivity {
     }
 
     private void updateVoicemailListView() {
+        Log.i(getClass().getSimpleName(), "Updating voicemails list of " + mPhoneNumber);
+
         ArrayList<LocalVoicemail> sentVoicemails = SentMailbox.getInstance().getVoicemails();
         ArrayList<Voicemail> receivedVoicemails = OpenTouchClient.getInstance().getDefaultMailbox().getVoicemails();
 
@@ -105,34 +108,42 @@ public class ThreadActivity extends ActionBarActivity {
         allVoicemails.addAll(sentVoicemails);
         allVoicemails.addAll(receivedVoicemails);
 
-        // on supprime les messages qui ne concernent pas ce contact
+        // on garde les messages de ce contact uniquement
+        ArrayList<BaseVoicemail> contactVoicemails = new ArrayList<>();
         for(BaseVoicemail voicemail: allVoicemails) {
             // message envoyé
             if(voicemail instanceof LocalVoicemail) {
-                if(!voicemail.getDestination().getPhoneNumber().equals(mPhoneNumber)) {
-                    allVoicemails.remove(voicemail);
+                if(voicemail.getDestination().getPhoneNumber().equals(mPhoneNumber)) {
+                    contactVoicemails.add(voicemail);
                 }
             }
             // message reçu
             else if(voicemail instanceof Voicemail) {
-                if(!voicemail.getFrom().getPhoneNumber().equals(mPhoneNumber)) {
-                    allVoicemails.remove(voicemail);
+                if(voicemail.getFrom().getPhoneNumber().equals(mPhoneNumber)) {
+                    contactVoicemails.add(voicemail);
                 }
             }
             // aucun des deux -> erreur
             else {
-                throw new RuntimeException();
+                throw new RuntimeException("This message is neither LocalVoicemail or Voicemail!");
             }
         }
 
         // Tri par date décroissante
-        Collections.sort(allVoicemails, new Comparator<BaseVoicemail>() {
+        Collections.sort(contactVoicemails, new Comparator<BaseVoicemail>() {
             @Override
             public int compare(BaseVoicemail lhs, BaseVoicemail rhs) {
                 return rhs.getDate().compareTo(lhs.getDate());
             }
         });
 
-        mVoicemailListView.setAdapter(new VoicemailAdapter(allVoicemails));
+        mVoicemailListView.setAdapter(new VoicemailAdapter(contactVoicemails));
+
+        // S'il n'y a aucun message, on affiche un petit texte pour le dire
+        TextView noMessageTextView = (TextView)findViewById(R.id.no_message_text_view);
+        if(contactVoicemails.size() == 0)
+            noMessageTextView.setVisibility(View.VISIBLE);
+        else
+            noMessageTextView.setVisibility(View.INVISIBLE);
     }
 }
