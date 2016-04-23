@@ -105,7 +105,7 @@ public class DropboxClient {
                 messageUploadedIntent.putExtra("url", voicemail.getUrl());
                 App.getContext().sendBroadcast(messageUploadedIntent);
             } catch (Exception e) {
-                Log.e(getClass().getSimpleName(), "Something went wrong: " + e);
+                e.printStackTrace();
             } finally {
                 if (inputStream != null) {
                     try {

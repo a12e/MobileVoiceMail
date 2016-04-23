@@ -89,15 +89,13 @@ public class ThreadsActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_threads);
 
-        final Intent itent = new Intent(this, RecordMessageActivity.class);
         final ImageButton recordButton = (ImageButton)findViewById(R.id.record_button);
         recordButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(itent);
+                startActivity(new Intent(ThreadsActivity.this, RecordMessageActivity.class));
             }
         });
-
 
         // List of all threads
         mThreadsListView = (ListView)findViewById(R.id.threads_list_view);
@@ -105,8 +103,10 @@ public class ThreadsActivity extends ActionBarActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Identifier identifier = (Identifier)parent.getItemAtPosition(position);
-                Toast.makeText(getApplicationContext(), "Clicked on " +
-                        identifier.getDisplayName(), Toast.LENGTH_LONG).show();
+                // Ouverture de l'activité du fil des messages avec cette personne
+                Intent openThreadIntent = new Intent(ThreadsActivity.this, ThreadActivity.class);
+                openThreadIntent.putExtra("phoneNumber", identifier.getPhoneNumber());
+                startActivity(openThreadIntent);
             }
         });
 

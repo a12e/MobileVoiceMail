@@ -11,11 +11,11 @@
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
 
     <application
+        android:name="com.alcatel.mobilevoicemail.App"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        android:name="com.alcatel.mobilevoicemail.App"
         android:theme="@style/AppTheme">
         <activity
             android:name=".LoginActivity"
@@ -25,12 +25,10 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-
         </activity>
         <activity
             android:name=".SearchContactResultsActivity"
             android:label="@string/title_activity_search_results">
-
             <intent-filter>
                 <action android:name="android.intent.action.SEARCH" />
             </intent-filter>
@@ -38,32 +36,33 @@
             <meta-data
                 android:name="android.app.searchable"
                 android:resource="@xml/searchable" />
-
         </activity>
         <activity
             android:name=".RecordMessageActivity"
-            android:label="@string/title_activity_record_message"/>
+            android:label="@string/title_activity_record_message" />
         <activity
             android:name=".ThreadsActivity"
             android:label="@string/title_activity_threads">
             <meta-data
                 android:name="android.app.default_searchable"
                 android:value=".SearchContactResultsActivity" />
-
-            </activity>
-
+        </activity>
         <activity
             android:name="com.dropbox.client2.android.AuthActivity"
-            android:launchMode="singleTask"
-            android:configChanges="orientation|keyboard">
+            android:configChanges="orientation|keyboard"
+            android:launchMode="singleTask">
             <intent-filter>
+
                 <!-- Change this to be db- followed by your app key -->
                 <data android:scheme="db-ydma9rv0xm4wf4d" />
+
                 <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.BROWSABLE"/>
+
+                <category android:name="android.intent.category.BROWSABLE" />
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
+        <activity android:name=".ThreadActivity"></activity>
     </application>
 
 </manifest>

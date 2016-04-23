@@ -28,18 +28,18 @@ public class Identifier {
 
     public static Identifier fromJson(JSONObject object) throws JSONException {
         Identifier identifier = new Identifier(object.getString("phoneNumber"));
-        identifier.mLoginName = object.getString("loginName");
-        identifier.mInstantMessagingId = object.getString("instantMessagingId");
-        identifier.mCompanyEmail = object.getString("companyEmail");
+        identifier.mLoginName = object.has("loginName") ? object.getString("loginName") : null;
+        identifier.mInstantMessagingId = object.has("instantMessagingId") ? object.getString("instantMessagingId") : null;
+        identifier.mCompanyEmail = object.has("companyEmail") ? object.getString("companyEmail") : null;
         return identifier;
     }
 
     public JSONObject toJson() throws JSONException {
         JSONObject object = new JSONObject();
-        object.put("loginName", mLoginName.equals("") ? null : mLoginName);
-        object.put("phoneNumber", mPhoneNumber.equals("") ? null : mPhoneNumber);
-        object.put("instantMessagingId", mInstantMessagingId.equals("") ? null : mInstantMessagingId);
-        object.put("companyEmail", mCompanyEmail.equals("") ? null : mCompanyEmail);
+        object.put("loginName", mLoginName != null && mLoginName.equals("") ? null : mLoginName);
+        object.put("phoneNumber", mLoginName != null && mPhoneNumber.equals("") ? null : mPhoneNumber);
+        object.put("instantMessagingId", mLoginName != null && mInstantMessagingId.equals("") ? null : mInstantMessagingId);
+        object.put("companyEmail", mLoginName != null && mCompanyEmail.equals("") ? null : mCompanyEmail);
         return object;
     }
 
@@ -60,9 +60,17 @@ public class Identifier {
     }
 
     public String getDisplayName() {
-        String displayName = mLoginName;
-        if(mPhoneNumber != null && !mPhoneNumber.equals("")) {
-            displayName = displayName.concat(" (" + mPhoneNumber + ")");
+        String displayName = "";
+        if(mLoginName != null && !mLoginName.equals("")) {
+            displayName = displayName.concat(mLoginName);
+        }
+        if (mPhoneNumber != null && !mPhoneNumber.equals("")) {
+            if(displayName.equals("")) {
+                displayName = mPhoneNumber;
+            }
+            else {
+                displayName = displayName.concat(" (" + mPhoneNumber + ")");
+            }
         }
         return displayName;
     }
