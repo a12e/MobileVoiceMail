@@ -37,7 +37,10 @@ public class ThreadActivity extends ActionBarActivity {
             throw new IllegalArgumentException("Please specify the phoneNumber extra in the Intent");
         }
         mPhoneNumber = getIntent().getStringExtra("phoneNumber");
-        setTitle(mPhoneNumber);
+        setTitle("Conversation avec " + mPhoneNumber);
+
+        // Affichage de l'icone "retour" dans l'ActionBar
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         final ImageButton recordButton = (ImageButton)findViewById(R.id.record_button);
         recordButton.setOnClickListener(new View.OnClickListener() {
