@@ -6,8 +6,6 @@ import android.util.Base64;
 import android.util.Log;
 
 import com.alcatel.mobilevoicemail.App;
-import com.alcatel.mobilevoicemail.SearchContactResultsActivity;
-import com.alcatel.mobilevoicemail.ThreadsActivity;
 import com.alcatel.mobilevoicemail.opentouch.exceptions.AuthenticationException;
 import com.alcatel.mobilevoicemail.opentouch.exceptions.ProtocolException;
 
@@ -28,9 +26,7 @@ import java.io.OutputStreamWriter;
 import java.net.CookieHandler;
 import java.net.CookieManager;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -252,35 +248,7 @@ public class OpenTouchClient {
         }
     }
 
-    //tache qui s'occupe de recuperer le contact recherché dans la liste de contacts de l'opentouch
-    class getContactsOpenTouchTask extends AsyncTask<String, Void, Void> {
-        protected Void doInBackground(String... params) {
-            if(params.length != 1) {
-                throw new IllegalArgumentException("Only one parameter");
-            }
-            try {
-                requestJson("POST", "/1.0/directory/search", "{\"directory\":null,\"limit\":0,\"filter\":{\"field\":\"lastName\",\"operand\":\"" + params[0] + "\",\"operation\":\"CONTAIN\"}}");
 
-                JSONObject contacts = getJson("/1.0/directory/search");
-
-                int sizeListContacts = contacts.getJSONArray("resultElements").length();
-                int i = 0;
-                for(i = 0;i<sizeListContacts;i++){
-                    String firstname = contacts.getJSONArray("resultElements").getJSONObject(i).getJSONArray("contacts").getJSONObject(0).getString("firstName");
-                    String lastname = contacts.getJSONArray("resultElements").getJSONObject(i).getJSONArray("contacts").getJSONObject(0).getString("lastName");
-                    SearchContactResultsActivity.getResultsSearch().add(firstname + " " + lastname); // Ajoute le nom/prenom à la liste affichant le resultat
-                }
-                return null;
-            } catch (Exception e) {
-                // Connection error
-                Log.e(getClass().getSimpleName(), "Get contacts error");
-                Log.e(getClass().getSimpleName(), e.toString());
-                e.printStackTrace();
-                App.getContext().sendBroadcast(new Intent("GETCONTACTS_ERROR"));
-            }
-            return null;
-        }
-    }
 
     public void login(String email, String password) {
         Log.i(getClass().getSimpleName(), "Starting login");
@@ -293,9 +261,4 @@ public class OpenTouchClient {
     }
 
     // Execute la requete afin de recuperer la liste des contacts contentant ce nom de famille
-    public void getContactOpenTouch(String name) {
-        Log.i(getClass().getSimpleName(), "Starting getting contacts from Opentouch");
-        new getContactsOpenTouchTask().execute(name);
-
-    }
 }

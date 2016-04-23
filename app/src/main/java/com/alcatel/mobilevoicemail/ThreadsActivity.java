@@ -140,7 +140,7 @@ public class ThreadsActivity extends ActionBarActivity {
 
         //Gestion de la recherche de contacts
         if (id == R.id.search) {
-            onSearchRequested();
+            startSearch(null, false, null, false);
             return true;
         }
 
@@ -154,15 +154,7 @@ public class ThreadsActivity extends ActionBarActivity {
 
         return super.onOptionsItemSelected(item);
     }
-
-    @Override
-    public boolean onSearchRequested() {
-        Bundle appData = new Bundle();
-        appData.putString("hello", "world");
-        startSearch(null, false, null, false);
-        return true;
-    }
-
+    
     private void updateThreadsListView() {
         ArrayList<LocalVoicemail> sentVoicemails = SentMailbox.getInstance().getVoicemails();
         ArrayList<Voicemail> receivedVoicemails = OpenTouchClient.getInstance().getDefaultMailbox().getVoicemails();
