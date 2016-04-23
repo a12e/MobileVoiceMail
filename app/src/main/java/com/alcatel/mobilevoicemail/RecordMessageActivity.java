@@ -12,7 +12,7 @@ import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.Toast;
 
 import com.alcatel.mobilevoicemail.opentouch.Identifier;
@@ -22,6 +22,8 @@ import java.io.File;
 import java.io.IOException;
 
 public class RecordMessageActivity extends ActionBarActivity {
+    public static final String INTENT_EXTRA_DESTINATION = "destination_phone_number";
+
     private static final int RECORDER_SAMPLERATE = 44100;
     private static final int RECORDER_CHANNELS = AudioFormat.CHANNEL_IN_MONO;
     private static final int RECORDER_CHANNELS_COUNT = 1;
@@ -31,28 +33,26 @@ public class RecordMessageActivity extends ActionBarActivity {
     int mBufferSize = 0;
     short[] mBuffer = null;
     private AudioRecord mAudioRecord = null;
-    Boolean mRecording = false;
-    private Button mRecordButton = null;
-    Thread mWriterThread;
-    private LocalVoicemail mRecordedVoicemail;
+    Boolean mIsRecording = false;
+    Thread mWavWriterThread;
+    private LocalVoicemail mCurrentlyRecordedVoicemail;
 
     private BroadcastReceiver mMessageSentReceiver;
     private BroadcastReceiver mMessageSentErrorReceiver;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_record_message);
 
-        mRecordButton = (Button)findViewById(R.id.record_button);
-        mRecordButton.setOnClickListener(new View.OnClickListener() {
+        ImageButton recordButton = (ImageButton)findViewById(R.id.stop_button);
+        recordButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (mRecording) {
+                if (mIsRecording) {
                     stopRecording();
                 } else {
-                    startRecording();
+                    throw new RuntimeException("Stop button pressed but recording was not started");
                 }
             }
         });
@@ -76,6 +76,16 @@ public class RecordMessageActivity extends ActionBarActivity {
                 RecordMessageActivity.this.finish();
             }
         }, new IntentFilter("MESSAGE_SENT_ERROR"));
+
+        // Récupération du destinataire et création du message
+        String destinationPhoneNumber = getIntent().getStringExtra(INTENT_EXTRA_DESTINATION);
+        if(destinationPhoneNumber == null) throw new NullPointerException("No destination !");
+        mCurrentlyRecordedVoicemail = new LocalVoicemail();
+        mCurrentlyRecordedVoicemail.setDestination(new Identifier(destinationPhoneNumber));
+        setTitle(destinationPhoneNumber);
+
+        // Démarre l'enregistrement dès que l'activité est crée
+        startRecording();
     }
 
     @Override
@@ -86,8 +96,6 @@ public class RecordMessageActivity extends ActionBarActivity {
     }
 
     protected void startRecording() {
-        mRecordButton.setText(R.string.finish);
-
         mBufferSize = AudioRecord.getMinBufferSize(RECORDER_SAMPLERATE, RECORDER_CHANNELS,
                 RECORDER_AUDIO_ENCODING);
 
@@ -104,17 +112,15 @@ public class RecordMessageActivity extends ActionBarActivity {
         }
         mBuffer = new short[mBufferSize];
 
-        mRecordedVoicemail = new LocalVoicemail();
-        mRecordedVoicemail.setDestination(new Identifier("tpvoip3"));
-        Log.i(getClass().getSimpleName(), "Will write into wave file " + mRecordedVoicemail.getPath());
+        Log.i(getClass().getSimpleName(), "Will write into wave file " + mCurrentlyRecordedVoicemail.getPath());
 
         mAudioRecord.startRecording();
-        mRecording = true;
+        mIsRecording = true;
         Log.i(getClass().getSimpleName(), "Started recording");
 
-        mWriterThread = new Thread(new Runnable() {
+        mWavWriterThread = new Thread(new Runnable() {
             public void run() {
-                WaveWriter writer = new WaveWriter(new File(mRecordedVoicemail.getPath()),
+                WaveWriter writer = new WaveWriter(new File(mCurrentlyRecordedVoicemail.getPath()),
                         RECORDER_SAMPLERATE, RECORDER_CHANNELS_COUNT, RECORDER_SAMPLEBITS);
                 try {
                     writer.createWaveFile();
@@ -139,18 +145,17 @@ public class RecordMessageActivity extends ActionBarActivity {
                 }
             }
         }, "AudioRecorder Thread");
-        mWriterThread.start();
+        mWavWriterThread.start();
     }
 
     protected void stopRecording() {
         mAudioRecord.stop();
         mAudioRecord.release();
-        mRecording = false;
-        mRecordButton.setText(R.string.save);
+        mIsRecording = false;
         Log.i(getClass().getSimpleName(), "Stopped recording");
 
         try {
-            mWriterThread.join(); // wait for thread to finish
+            mWavWriterThread.join(); // wait for thread to finish
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -158,7 +163,7 @@ public class RecordMessageActivity extends ActionBarActivity {
         //DropboxClient.getInstance().startOAuth2Authentication(RecordMessageActivity.this);
 
         Log.d(getClass().getSimpleName(), "Will send message to Dropbox");
-        DropboxClient.getInstance().uploadVoicemail(mRecordedVoicemail);
+        DropboxClient.getInstance().uploadVoicemail(mCurrentlyRecordedVoicemail);
     }
 
     protected void onResume() {
@@ -174,7 +179,7 @@ public class RecordMessageActivity extends ActionBarActivity {
                 Log.i("DbAuthLog", "Error authenticating", e);
             }
 
-            DropboxClient.getInstance().uploadVoicemail(mRecordedVoicemail);
+            DropboxClient.getInstance().uploadVoicemail(mCurrentlyRecordedVoicemail);
         }
     }
 }

@@ -28,6 +28,8 @@
     <string name="contact_photo">Photo du contact</string>
     <string name="message_sent_error">Malheursement, votre message n\'a pas pu être envoyé.</string>
     <string name="message_sent_error_title">Erreur lors de l\'envoi</string>
+    <string name="currently_recording">Enregistrement en cours</string>
+    <string name="press_stop_to_complete">Appuyez sur le bouton pour terminer</string>
 
 
 </resources>

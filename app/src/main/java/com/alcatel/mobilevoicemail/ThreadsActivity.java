@@ -89,14 +89,6 @@ public class ThreadsActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_threads);
 
-        final ImageButton recordButton = (ImageButton)findViewById(R.id.record_button);
-        recordButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(ThreadsActivity.this, RecordMessageActivity.class));
-            }
-        });
-
         // List of all threads
         mThreadsListView = (ListView)findViewById(R.id.threads_list_view);
         mThreadsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {

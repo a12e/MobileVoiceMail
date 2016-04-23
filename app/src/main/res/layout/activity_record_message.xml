@@ -9,11 +9,32 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.alcatel.mobilevoicemail.RecordMessageActivity">
 
-    <Button
+    <ImageButton
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Enregistrer"
-        android:id="@+id/record_button"
+        android:id="@+id/stop_button"
+        android:src="@mipmap/ic_recordbutton"
+        android:background="@null"
+        android:adjustViewBounds="false"
+        android:layout_below="@+id/stop_explanation_text_view"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="50dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="@string/press_stop_to_complete"
+        android:id="@+id/stop_explanation_text_view"
         android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="@string/currently_recording"
+        android:id="@+id/recording_text_view"
+        android:layout_above="@+id/stop_explanation_text_view"
         android:layout_centerHorizontal="true" />
 </RelativeLayout>

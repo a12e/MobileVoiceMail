@@ -1,5 +1,6 @@
 package com.alcatel.mobilevoicemail;
 
+import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.text.format.DateUtils;
@@ -7,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -36,6 +38,16 @@ public class ThreadActivity extends ActionBarActivity {
         }
         mPhoneNumber = getIntent().getStringExtra("phoneNumber");
         setTitle(mPhoneNumber);
+
+        final ImageButton recordButton = (ImageButton)findViewById(R.id.record_button);
+        recordButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(ThreadActivity.this, RecordMessageActivity.class);
+                intent.putExtra(RecordMessageActivity.INTENT_EXTRA_DESTINATION, mPhoneNumber);
+                startActivity(intent);
+            }
+        });
 
         updateVoicemailListView();
     }
