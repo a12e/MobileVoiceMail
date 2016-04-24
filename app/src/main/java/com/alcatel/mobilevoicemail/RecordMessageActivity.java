@@ -22,7 +22,7 @@ import java.io.File;
 import java.io.IOException;
 
 public class RecordMessageActivity extends ActionBarActivity {
-    public static final String INTENT_EXTRA_DESTINATION = "destination_phone_number";
+    public static final String INTENT_EXTRA_DESTINATION = "destination";
 
     private static final int RECORDER_SAMPLERATE = 44100;
     private static final int RECORDER_CHANNELS = AudioFormat.CHANNEL_IN_MONO;
@@ -78,11 +78,11 @@ public class RecordMessageActivity extends ActionBarActivity {
         }, new IntentFilter("MESSAGE_SENT_ERROR"));
 
         // Récupération du destinataire et création du message
-        String destinationPhoneNumber = getIntent().getStringExtra(INTENT_EXTRA_DESTINATION);
-        if(destinationPhoneNumber == null) throw new NullPointerException("No destination !");
+        Identifier destination = (Identifier)getIntent().getSerializableExtra(INTENT_EXTRA_DESTINATION);
+        if(destination == null) throw new NullPointerException("No destination !");
         mCurrentlyRecordedVoicemail = new LocalVoicemail();
-        mCurrentlyRecordedVoicemail.setDestination(new Identifier(destinationPhoneNumber));
-        setTitle(destinationPhoneNumber);
+        mCurrentlyRecordedVoicemail.setDestination(destination);
+        setTitle(destination.getDisplayName());
 
         // Démarre l'enregistrement dès que l'activité est crée
         startRecording();

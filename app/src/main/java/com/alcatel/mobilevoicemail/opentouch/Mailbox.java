@@ -18,6 +18,8 @@ import java.util.ArrayList;
 import java.util.Objects;
 
 public class Mailbox {
+    public static final String INTENT_EXTRA_DESTINATION = "destination";
+    public static final String INTENT_EXTRA_MESSAGE_URL = "url";
 
     protected int mId;
     private ArrayList<Voicemail> mVoicemails;
@@ -30,8 +32,8 @@ public class Mailbox {
             @Override
             public void onReceive(Context context, Intent intent) {
                 ArrayList<Identifier> destinations = new ArrayList<>();
-                destinations.add(new Identifier(intent.getStringExtra("destination")));
-                sendMessage(destinations, false, intent.getStringExtra("url"));
+                destinations.add((Identifier)intent.getSerializableExtra(INTENT_EXTRA_DESTINATION));
+                sendMessage(destinations, false, intent.getStringExtra(INTENT_EXTRA_MESSAGE_URL));
             }
         };
         App.getContext().registerReceiver(mMessageUploadedReceiver, new IntentFilter("MESSAGE_UPLOADED"));
@@ -44,7 +46,7 @@ public class Mailbox {
     private class FetchMessagesTask extends AsyncTask<Void, Void, Void> {
         @Override
         protected Void doInBackground(Void... params) {
-            Log.i(getClass().getSimpleName(), "Fetching messages");
+            Log.i(getClass().getSimpleName(), "Fetching messages for the Mailbox " + mId);
 
             try {
                 // Get all messages from this mailbox
@@ -62,7 +64,8 @@ public class Mailbox {
                     mVoicemails.add(freshVoicemail);
                 }
 
-                Log.i(getClass().getSimpleName(), "Messages received " + voicemails.toString());
+                Log.i(getClass().getSimpleName(), "Messages received in mailbox " + mId + " = "
+                        + voicemails.toString());
                 App.getContext().sendBroadcast(new Intent("MAILBOX_SYNC"));
             } catch (Exception e) {
                 e.printStackTrace();
@@ -94,17 +97,20 @@ public class Mailbox {
                 request.put("destinations", destinations);
                 request.put("highPriority", parameters.highPriority);
                 request.put("url", parameters.url);
-                // TODO THIS IS A TEMPORARY FIX !!
+                //TODO THIS IS A TEMPORARY FIX !!
                 //request.put("url", "http://130.79.92.110/edison.wav");
-               // request.put("url", "http://130.79.92.110/edison.wav");
+                //request.put("url", "http://130.79.92.110/edison.wav");
 
                 String jsonData = request.toString().replace("\\", "");
+                //jsonData = jsonData.replace("phoneNumber", "loginName");
+                //jsonData = jsonData.replace("1001", "tpvoip1");
 
-                Log.i(getClass().getSimpleName(), "sendMessage request: " + jsonData);
+                Log.e(getClass().getSimpleName(), jsonData);
+
                 JSONObject response = OpenTouchClient.getInstance().requestJson("POST",
                         "/1.0/messaging/mailboxes/" + mId + "/recorder/send", jsonData);
 
-                Log.i(getClass().getSimpleName(), "sendMessage OK " + response.toString());
+                Log.i(getClass().getSimpleName(), "Response OK:" + response.toString());
                 App.getContext().sendBroadcast(new Intent("MESSAGE_SENT"));
             } catch (Exception e) {
                 Intent errorIntent = new Intent("ERROR");
@@ -127,5 +133,9 @@ public class Mailbox {
         params.highPriority = highPriority;
         params.url = url;
         new SendMessageTask().execute(params);
+    }
+
+    public int getId() {
+        return mId;
     }
 }

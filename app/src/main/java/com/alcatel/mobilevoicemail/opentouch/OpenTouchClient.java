@@ -36,7 +36,7 @@ public class OpenTouchClient {
 
     private static OpenTouchClient mInstance = null;
     private String mBaseUrl = "https://tps-opentouch.u-strasbg.fr/api/rest";
-    //private String mBaseUrl = "https://192.168.1.200:4430/api/rest";
+    //private String mBaseUrl = "https://192.168.1.251:4430/api/rest";
     private String mLoginName = null;
     private CookieManager mCookieStore;
     private Mailbox mDefaultMailbox;
@@ -199,6 +199,7 @@ public class OpenTouchClient {
 
                 // Fetch all mailboxes, and set the first as default mailbox
                 JSONArray mailBoxes = getJson("/1.0/messaging/mailboxes").getJSONArray("mailboxes");
+                Log.i(getClass().getSimpleName(), "Mailboxes = " + mailBoxes.toString());
                 int defaultMailboxId = mailBoxes.getJSONObject(0).getInt("id");
                 mDefaultMailbox = new Mailbox(defaultMailboxId);
 
@@ -236,11 +237,13 @@ public class OpenTouchClient {
                 if (disconnect1.getResponseCode() != 204) {
                     throw new ProtocolException("Expected a 204 response code");
                 }
+
+                Log.i(getClass().getSimpleName(), "Logout success");
                 App.getContext().sendBroadcast(new Intent("LOGOUT_SUCCESS"));
                 return null;
             } catch (Exception e) {
                 // Connection error
-                Log.e(getClass().getSimpleName(), "Log out error");
+                Log.e(getClass().getSimpleName(), "Logout error");
                 Log.e(getClass().getSimpleName(), e.toString());
                 App.getContext().sendBroadcast(new Intent("LOGOUT_ERROR"));
             }

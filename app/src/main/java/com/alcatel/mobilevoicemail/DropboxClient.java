@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import com.alcatel.mobilevoicemail.opentouch.Mailbox;
 import com.dropbox.client2.DropboxAPI;
 import com.dropbox.client2.android.AndroidAuthSession;
 import com.dropbox.client2.exception.DropboxException;
@@ -101,8 +102,8 @@ public class DropboxClient {
 
                 // Notify the app that the message has been successfully sent to Dropbox
                 Intent messageUploadedIntent = new Intent("MESSAGE_UPLOADED");
-                messageUploadedIntent.putExtra("destination", voicemail.getDestination().getPhoneNumber());
-                messageUploadedIntent.putExtra("url", voicemail.getUrl());
+                messageUploadedIntent.putExtra(Mailbox.INTENT_EXTRA_DESTINATION, voicemail.getDestination());
+                messageUploadedIntent.putExtra(Mailbox.INTENT_EXTRA_MESSAGE_URL, voicemail.getUrl());
                 App.getContext().sendBroadcast(messageUploadedIntent);
             } catch (Exception e) {
                 e.printStackTrace();

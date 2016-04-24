@@ -66,6 +66,7 @@ public class SearchContactResultsActivity extends ActionBarActivity {
         JSONArray jsonResults;
         try {
             jsonResults = new JSONArray(searchResult);
+            Log.i(getClass().getSimpleName(), "Search results = " + searchResult);
 
             // on les transforme en PartyInfo
             ArrayList<PartyInfo> results = new ArrayList<>();
@@ -83,7 +84,7 @@ public class SearchContactResultsActivity extends ActionBarActivity {
 
                     // Ouverture de l'activité du fil des messages avec cette personne
                     Intent openThreadIntent = new Intent(SearchContactResultsActivity.this, ThreadActivity.class);
-                    openThreadIntent.putExtra("phoneNumber", partyInfo.getIdentifier().getPhoneNumber());
+                    openThreadIntent.putExtra(ThreadActivity.INTENT_EXTRA_IDENTIFIER, partyInfo.getIdentifier());
                     startActivity(openThreadIntent);
 
                     // On ferme l'activité des résultats

@@ -3,6 +3,8 @@ package com.alcatel.mobilevoicemail;
 import android.app.Application;
 import android.content.Context;
 
+import com.alcatel.mobilevoicemail.opentouch.OpenTouchClient;
+
 public class App extends Application {
     private static Application sApplication;
 
@@ -18,5 +20,11 @@ public class App extends Application {
     public void onCreate() {
         super.onCreate();
         sApplication = this;
+    }
+
+    @Override
+    public void onTerminate() {
+        OpenTouchClient.getInstance().logout();
+        super.onTerminate();
     }
 }

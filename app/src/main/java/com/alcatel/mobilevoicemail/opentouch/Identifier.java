@@ -3,9 +3,10 @@ package com.alcatel.mobilevoicemail.opentouch;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.Serializable;
 import java.util.Date;
 
-public class Identifier {
+public class Identifier implements Serializable {
     private String mLoginName;
     private String mPhoneNumber;
     private String mInstantMessagingId;
@@ -36,12 +37,14 @@ public class Identifier {
 
     public JSONObject toJson() throws JSONException {
         JSONObject object = new JSONObject();
-        object.put("loginName", mLoginName != null && mLoginName.equals("") ? null : mLoginName);
-        object.put("phoneNumber", mLoginName != null && mPhoneNumber.equals("") ? null : mPhoneNumber);
-        object.put("instantMessagingId", mLoginName != null && mInstantMessagingId.equals("") ? null : mInstantMessagingId);
-        object.put("companyEmail", mLoginName != null && mCompanyEmail.equals("") ? null : mCompanyEmail);
+        object.put("loginName", mLoginName != null ? mLoginName : JSONObject.NULL);
+        object.put("phoneNumber", mPhoneNumber != null ? mPhoneNumber : JSONObject.NULL);
+        object.put("instantMessagingId", mInstantMessagingId != null ? mInstantMessagingId : JSONObject.NULL);
+        object.put("companyEmail", mCompanyEmail != null ? mCompanyEmail : JSONObject.NULL);
         return object;
     }
+
+    private static final long serialVersionUID = 258558687L;
 
     public String getLoginName() {
         return mLoginName;

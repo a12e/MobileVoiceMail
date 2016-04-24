@@ -91,7 +91,7 @@ public class ThreadsActivity extends ActionBarActivity {
                 Identifier identifier = (Identifier)parent.getItemAtPosition(position);
                 // Ouverture de l'activité du fil des messages avec cette personne
                 Intent openThreadIntent = new Intent(ThreadsActivity.this, ThreadActivity.class);
-                openThreadIntent.putExtra("phoneNumber", identifier.getPhoneNumber());
+                openThreadIntent.putExtra(ThreadActivity.INTENT_EXTRA_IDENTIFIER, identifier);
                 startActivity(openThreadIntent);
             }
         });
